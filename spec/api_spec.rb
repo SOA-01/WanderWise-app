@@ -1,5 +1,8 @@
 require 'rspec'
 require 'yaml'
+require 'simplecov'
+SimpleCov.start
+
 require_relative '../lib/FlightsAPI'
 require_relative '../lib/NYTimesAPI'
 require_relative '../lib/FlightsEntity'
@@ -60,7 +63,7 @@ RSpec.describe WanderWise::NYTimesAPI do
                           record: :new_episodes,
                           match_requests_on: %i[method uri body]
     end
-    
+
     let(:nytimesapi) { WanderWise::NYTimesAPI.new }
   
     curr_dir = File.dirname(File.realpath(__FILE__))

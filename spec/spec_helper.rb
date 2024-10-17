@@ -3,10 +3,13 @@ require 'minitest/autorun'
 require 'minitest/rg'
 require 'vcr'
 require 'webmock'
+
+
 require_relative '../lib/FlightsAPI'
 require_relative '../lib/NYTimesAPI'
 require_relative '../lib/FlightsEntity'
 require_relative '../lib/NYTimesEntity'
+
 
 
 
