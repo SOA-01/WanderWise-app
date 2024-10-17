@@ -4,10 +4,29 @@ require_relative '../lib/FlightsAPI'
 require_relative '../lib/NYTimesAPI'
 require_relative '../lib/FlightsEntity'
 require_relative '../lib/NYTimesEntity'
-#require_relative 'spec_helper'
+require_relative 'spec_helper'
 
 RSpec.describe WanderWise::FlightsAPI do
+
+  VCR.configure do |c|
+    c.cassette_library_dir = CASSETTES_FOLDER
+    c.hook_into :webmock
+  end
+
+  before do
+    VCR.insert_cassette CASSETTE_FILE_FLIGHTS, 
+                        record: :new_episodes, 
+                        match_requests_on: %i[method uri body]
+  end
+
+  after do
+    VCR.eject_cassette
+  end
+
+
   let(:flightsapi) { WanderWise::FlightsAPI.new }
+
+
 
   curr_dir = File.dirname(File.realpath(__FILE__))
   let(:fixture_flight) { YAML.load_file(curr_dir + "/fixtures/flight-offers-results.yml") }
@@ -30,6 +49,18 @@ RSpec.describe WanderWise::FlightsAPI do
 end
 
 RSpec.describe WanderWise::NYTimesAPI do
+
+    VCR.configure do |c|
+      c.cassette_library_dir = CASSETTES_FOLDER
+      c.hook_into :webmock
+    end
+
+    before do
+      VCR.insert_cassette CASSETTE_FILE_NYT,
+                          record: :new_episodes,
+                          match_requests_on: %i[method uri body]
+    end
+    
     let(:nytimesapi) { WanderWise::NYTimesAPI.new }
   
     curr_dir = File.dirname(File.realpath(__FILE__))
