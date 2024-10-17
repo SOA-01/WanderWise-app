@@ -1,6 +1,8 @@
 require 'http'
 require 'yaml'
 require 'json'
+require_relative 'FlightsEntity'
+
 
 def fetch_resource(url, params = {})
   response = HTTP.get(url, params: params)
@@ -8,7 +10,7 @@ def fetch_resource(url, params = {})
 end
 
 def load_api_credentials
-  YAML.load_file('../config/secrets.yml')
+  YAML.load_file('./config/secrets.yml')
 end
 
 def authenticate(secrets)
@@ -45,66 +47,70 @@ def fetch_flight_offers(origin, destination, date, adults)
   fetch_response(access_token, params)
 end
 
-flight_offers = fetch_flight_offers('TPE', 'LAX', '2024-10-07', 1)
+# flight_offers = fetch_flight_offers('TPE', 'LAX', '2024-10-07', 1)
 
-File.open('../spec/fixtures/flight-offers-results.yml', 'w') do |file|
-  file.write(flight_offers.to_yaml)
-end
+# File.open('../spec/fixtures/flight-offers-results.yml', 'w') do |file|
+#   file.write(flight_offers.to_yaml)
+# end
 
-puts 'Flight offers saved to spec/fixtures/flight-offers-results.yml'
+# puts 'Flight offers saved to spec/fixtures/flight-offers-results.yml'
 
-# ----- 2. NY API -----
+flightEntity = WanderWise::FlightsEntity.new
+flightEntity.yamlFlightInfo
 
-secrets = load_api_credentials
-API_KEY = secrets['nytimes_api_key']
 
-def fetch_last_week
-  today = DateTime.now
-  last_week = today - 7
-  last_week.strftime('%Y%m%d')
-end
+# # ----- 2. NY API -----
 
-def fetch_articles(keyword)
-  base_url = 'https://api.nytimes.com/svc/search/v2/articlesearch.json'
+# secrets = load_api_credentials
+# API_KEY = secrets['nytimes_api_key']
 
-  params = {
-    'q' => keyword,
-    'begin_date' => fetch_last_week,
-    'end_date' => DateTime.now.strftime('%Y%m%d'),
-    'api-key' => API_KEY
-  }
+# def fetch_last_week
+#   today = DateTime.now
+#   last_week = today - 7
+#   last_week.strftime('%Y%m%d')
+# end
 
-  response = HTTP.get(base_url, params: params)
+# def fetch_articles(keyword)
+#   base_url = 'https://api.nytimes.com/svc/search/v2/articlesearch.json'
 
-  if response.status == 200
-    articles = JSON.parse(response.body.to_s)['response']['docs']
+#   params = {
+#     'q' => keyword,
+#     'begin_date' => fetch_last_week,
+#     'end_date' => DateTime.now.strftime('%Y%m%d'),
+#     'api-key' => API_KEY
+#   }
 
-    save_articles_to_yaml(articles)
+#   response = HTTP.get(base_url, params: params)
 
-    articles.each do |article|
-      puts "Title: #{article.dig('headline', 'main') || 'No title'}"
-      puts "Published Date: #{article['pub_date'] || 'No date'}"
-      puts "URL: #{article['web_url'] || 'No URL'}"
-      puts '-' * 80
-    end
-  else
-    puts "Error: Unable to fetch articles. Status code: #{response.status}"
-  end
-end
+#   if response.status == 200
+#     articles = JSON.parse(response.body.to_s)['response']['docs']
 
-def save_articles_to_yaml(articles)
-  dir_path = '../spec/fixtures'
-  FileUtils.mkdir_p(dir_path) unless Dir.exist?(dir_path)
+#     save_articles_to_yaml(articles)
 
-  file_path = File.join(dir_path, 'nytimes-results.yml')
+#     articles.each do |article|
+#       puts "Title: #{article.dig('headline', 'main') || 'No title'}"
+#       puts "Published Date: #{article['pub_date'] || 'No date'}"
+#       puts "URL: #{article['web_url'] || 'No URL'}"
+#       puts '-' * 80
+#     end
+#   else
+#     puts "Error: Unable to fetch articles. Status code: #{response.status}"
+#   end
+# end
 
-  File.open(file_path, 'w') do |file|
-    file.write(articles.to_yaml)
-  end
+# def save_articles_to_yaml(articles)
+#   dir_path = '../spec/fixtures'
+#   FileUtils.mkdir_p(dir_path) unless Dir.exist?(dir_path)
 
-  puts "Articles saved to #{file_path}"
-end
+#   file_path = File.join(dir_path, 'nytimes-results.yml')
 
-# Example usage
-keyword = 'Taiwan' # Change the keyword to what you want
-fetch_articles(keyword)
+#   File.open(file_path, 'w') do |file|
+#     file.write(articles.to_yaml)
+#   end
+
+#   puts "Articles saved to #{file_path}"
+# end
+
+# # Example usage
+# keyword = 'Taiwan' # Change the keyword to what you want
+# fetch_articles(keyword)
