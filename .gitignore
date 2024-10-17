@@ -3,3 +3,4 @@ config/secrets.yml
 spec/fixtures/*
 !spec/fixtures/.keep
 coverage/*
+.DS_Store

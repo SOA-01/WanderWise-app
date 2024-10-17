@@ -1,3 +1,7 @@
+require 'http'
+require 'yaml'
+require 'json'
+
 module WanderWise
     # Initialize the API client
 
