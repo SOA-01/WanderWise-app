@@ -2,10 +2,10 @@
 
 source 'https://rubygems.org'
 
-gem 'rubocop'
 gem 'flog'
-gem 'yaml'
 gem 'http'
 gem 'json'
-gem 'simplecov'
 gem 'reek'
+gem 'rubocop'
+gem 'simplecov'
+gem 'yaml'
