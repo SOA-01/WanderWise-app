@@ -5,10 +5,10 @@ require 'yaml'
 require 'simplecov'
 SimpleCov.start
 
-require_relative '../lib/FlightsAPI'
-require_relative '../lib/NYTimesAPI'
-require_relative '../lib/FlightsEntity'
-require_relative '../lib/NYTimesEntity'
+require_relative '../lib/flights_api'
+require_relative '../lib/nytimes_api'
+require_relative '../lib/flights_entity'
+require_relative '../lib/nytimes_entity'
 require_relative 'spec_helper'
 
 RSpec.describe WanderWise::FlightsAPI do

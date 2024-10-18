@@ -6,10 +6,10 @@ require 'minitest/rg'
 require 'vcr'
 require 'webmock'
 
-require_relative '../lib/FlightsAPI'
-require_relative '../lib/NYTimesAPI'
-require_relative '../lib/FlightsEntity'
-require_relative '../lib/NYTimesEntity'
+require_relative '../lib/flights_api'
+require_relative '../lib/nytimes_api'
+require_relative '../lib/flights_entity'
+require_relative '../lib/nytimes_entity'
 
 curr_dir = __dir__
 CORRECT_NYT = YAML.load_file("#{curr_dir}/fixtures/nytimes-results.yml")
