@@ -5,19 +5,18 @@ module WanderWise
 
   class NYTimesEntity
     @api = nil
-    @default_keyword = 'Taiwan'
     
     def initialize
         @api = NYTimesAPI.new
     end
 
-    def getArticles(keyword)
+    def get_articles(keyword)
       # Get the articles
         @api.fetch_recent_articles(keyword)
     end
 
     def save_articles_to_yaml
-        articles = getArticles(@default_keyword)
+        articles = get_articles('Taiwan')
         dir_path = './spec/fixtures'
         FileUtils.mkdir_p(dir_path) unless Dir.exist?(dir_path)
       

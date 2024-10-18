@@ -1,29 +1,28 @@
 
 
 module WanderWise
+    # Handles all API requests to the NY Times API
     class NYTimesAPI
+        # Initialize the API client
         def initialize
-            @secrets = load_api_credentials
+            @secrets = YAML.load_file('./config/secrets.yml')
             @api_key = @secrets['nytimes_api_key']
         end
 
-        def load_api_credentials
-            YAML.load_file('./config/secrets.yml')
-        end
-
+        # Generate last week's date in the format required by the API
         private def get_last_week
-            today = DateTime.now
-            last_week = today - 7
-            last_week.strftime('%Y%m%d')
+            
         end
     
         def fetch_recent_articles(keyword)
+            today = DateTime.now
+            one_week_ago = (today-7).strftime('%Y%m%d')
             base_url = 'https://api.nytimes.com/svc/search/v2/articlesearch.json'
           
             params = {
               'q' => keyword,
-              'begin_date' => get_last_week,
-              'end_date' => DateTime.now.strftime('%Y%m%d'),
+              'begin_date' => one_week_ago,
+              'end_date' => today.strftime('%Y%m%d'),
               'api-key' => @api_key
             }
 
@@ -34,10 +33,10 @@ module WanderWise
         private def fetch_articles(base_url, params) 
         
             response = HTTP.get(base_url, params: params)
-          
-            if response.status == 200
+            status_code = response.status
+
+            if status_code == 200
               articles = JSON.parse(response.body.to_s)['response']['docs']
-          
               articles.each do |article|
                 puts "Title: #{article.dig('headline', 'main') || 'No title'}"
                 puts "Published Date: #{article['pub_date'] || 'No date'}"
@@ -45,7 +44,7 @@ module WanderWise
                 puts '-' * 80
               end
             else
-              puts "Error: Unable to fetch articles. Status code: #{response.status}"
+              puts "Error: Unable to fetch articles. Status code: #{status_code}"
             end
         end
     end
