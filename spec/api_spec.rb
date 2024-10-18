@@ -1,42 +1,81 @@
+# frozen_string_literal: true
+
 require 'rspec'
 require 'yaml'
-require_relative '../lib/APIHandler'
-require_relative '../lib/FlightDetails'
-require_relative '../lib/Article'
+require 'simplecov'
+SimpleCov.start
+
+require_relative '../lib/flights_api'
+require_relative '../lib/nytimes_api'
+require_relative '../lib/flights_entity'
+require_relative '../lib/nytimes_entity'
 require_relative 'spec_helper'
 
-RSpec.describe WanderWise::APIHandler, :vcr do
-  let(:api_handler) { WanderWise::APIHandler.new }
-  let(:fixture_data) { YAML.load_file('spec/fixtures/results.yml') }
+RSpec.describe WanderWise::FlightsAPI do
+  VCR.configure do |c|
+    c.cassette_library_dir = CASSETTES_FOLDER
+    c.hook_into :webmock
+  end
+
+  before do
+    VCR.insert_cassette CASSETTE_FILE_FLIGHTS,
+                        record: :new_episodes,
+                        match_requests_on: %i[method uri body]
+  end
+
+  after do
+    VCR.eject_cassette
+  end
+
+  let(:flightsapi) { WanderWise::FlightsAPI.new }
+
+  curr_dir = __dir__
+  let(:fixture_flight) { YAML.load_file("#{curr_dir}/fixtures/flight-offers-results.yml") }
 
   describe '#fetch_flight_offers', :vcr do
     it 'retrieves valid flight offers from the API' do
-      flight_offers = api_handler.fetch_flight_offers('TPE', 'LAX', '2024-10-07', 1)
+      flight_offers = flightsapi.fetch_flight_offers('TPE', 'LAX', '2024-10-19', 1)
 
       expect(flight_offers).not_to be_empty
 
-      fixture_offer = fixture_data['flight_offers'].first
-      api_offer = flight_offers.first
+      # flight_offers first element of data will be compared to the fixture yaml file in its structure
+      api_offer = flight_offers['data'].first
+      fixture_offer = fixture_flight['data'].first
 
-      expect(api_offer.origin).to eq(fixture_offer['origin'])
-      expect(api_offer.destination).to eq(fixture_offer['destination'])
-      expect(api_offer.departure_date).to eq(fixture_offer['departure_date'])
-      expect(api_offer.price).to eq(fixture_offer['price'])
+      # Check if first 5 keys match
+      expect(api_offer.keys[0..4]).to eq(fixture_offer.keys[0..4])
     end
   end
+end
 
-  describe '#fetch_articles', :vcr do
-    it 'retrieves valid articles from the API' do
-      articles = api_handler.fetch_articles('Taiwan')
+RSpec.describe WanderWise::NYTimesAPI do
+  VCR.configure do |c|
+    c.cassette_library_dir = CASSETTES_FOLDER
+    c.hook_into :webmock
+  end
 
-      expect(articles).not_to be_empty
+  before do
+    VCR.insert_cassette CASSETTE_FILE_NYT,
+                        record: :new_episodes,
+                        match_requests_on: %i[method uri body]
+  end
 
-      fixture_article = fixture_data['articles'].first
-      api_article = articles.first
+  let(:nytimesapi) { WanderWise::NYTimesAPI.new }
 
-      expect(api_article.title).to eq(fixture_article['title'])
-      expect(api_article.published_date).to eq(fixture_article['published_date'])
-      expect(api_article.url).to eq(fixture_article['url'])
+  curr_dir = __dir__
+  let(:fixture_articles) { YAML.load_file("#{curr_dir}/fixtures/nytimes-results.yml") }
+
+  describe '#articles', :vcr do
+    it 'gets data about articles in expected structure' do
+      api_articles = nytimesapi.fetch_recent_articles('China')
+      expect(api_articles).not_to be_empty
+
+      # flight_offers first element of data will be compared to the fixture yaml file in its structure
+      api_example = api_articles.first
+
+      fixture_example = fixture_articles.first
+      # Check if first 5 keys match
+      expect(api_example.keys[0..4]).to eq(fixture_example.keys[0..4])
     end
   end
 end

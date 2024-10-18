@@ -1,14 +1,15 @@
-# Example usage
-require_relative 'APIClient'
+# frozen_string_literal: true
 
-client = WanderWise::APIClient.new
+require 'http'
+require 'yaml'
+require 'json'
+require_relative 'flights_entity'
+require_relative 'nytimes_entity'
 
-# Fetching flight offers
-flight_offers = client.fetch_flight_data('TPE', 'LAX', '2024-10-07', 1)
-flight_offers.each { |offer| puts offer }
+# ----- 1. Flight API -----
+flight_entity = WanderWise::FlightsEntity.new
+flight_entity.yaml_flight_info
 
-# Fetching articles
-articles = client.fetch_articles('Taiwan')
-articles.each { |article| puts article }
-
-
+# ----- 2. NY API ----- # Change the keyword to what you want
+times_entity = WanderWise::NYTimesEntity.new
+times_entity.save_articles_to_yaml

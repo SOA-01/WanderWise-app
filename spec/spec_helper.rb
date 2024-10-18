@@ -1,21 +1,20 @@
-require 'simplecov'
+# frozen_string_literal: true
+
+require 'yaml'
+require 'minitest/autorun'
+require 'minitest/rg'
 require 'vcr'
-require 'webmock/rspec'
+require 'webmock'
 
-SimpleCov.start do
-  add_filter '/spec/'    
-  add_filter '/config/'  
-  add_filter '/vendor/'   
-end
+require_relative '../lib/flights_api'
+require_relative '../lib/nytimes_api'
+require_relative '../lib/flights_entity'
+require_relative '../lib/nytimes_entity'
 
-puts "SimpleCov started"
+curr_dir = __dir__
+CORRECT_NYT = YAML.load_file("#{curr_dir}/fixtures/nytimes-results.yml")
+CORRECT_FLIGHTS = YAML.load_file("#{curr_dir}/fixtures/flight-offers-results.yml")
 
-VCR.configure do |config|
-  config.cassette_library_dir = 'spec/fixtures/cassettes'  
-  config.hook_into :webmock                                    
-  config.filter_sensitive_data('<SAFE_AMADEUS_CLIENT_ID>') { ENV['AMADEUS_CLIENT_ID'] }
-  config.filter_sensitive_data('<SAFE_AMADEUS_CLIENT_SECRET>') { ENV['AMADEUS_CLIENT_SECRET'] }
-  config.filter_sensitive_data('<SAFE_NYTIMES_API_KEY>') { ENV['NYTIMES_API_KEY'] }
-  config.configure_rspec_metadata!                             
-end
-
+CASSETTES_FOLDER = 'spec/fixtures/cassettes'
+CASSETTE_FILE_NYT = 'nyt_api'
+CASSETTE_FILE_FLIGHTS = 'flights_api'
