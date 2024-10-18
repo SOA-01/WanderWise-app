@@ -2,6 +2,6 @@ _*
 config/secrets.yml
 spec/fixtures/*
 !spec/fixtures/.keep
-coverage/*
-!coverage/.resultset.json
+spec/coverage/*
+!spec/coverage/.resultset.json
 .DS_Store
