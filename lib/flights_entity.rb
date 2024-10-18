@@ -3,7 +3,7 @@
 require 'yaml'
 require 'fileutils'
 
-require_relative 'FlightsAPI'
+require_relative 'flights_api'
 
 module WanderWise
   # Handles logic outside the API calls

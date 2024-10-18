@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'NYTimesAPI'
+require_relative 'ny_times_api'
 
 module WanderWise
   # Initialize the API client

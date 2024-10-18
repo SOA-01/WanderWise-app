@@ -3,8 +3,8 @@
 require 'http'
 require 'yaml'
 require 'json'
-require_relative 'FlightsEntity'
-require_relative 'NYTimesEntity'
+require_relative 'flights_entity'
+require_relative 'nytimes_entity'
 
 # ----- 1. Flight API -----
 flight_entity = WanderWise::FlightsEntity.new
