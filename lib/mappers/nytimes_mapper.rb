@@ -2,36 +2,48 @@
 
 require_relative '../gateways/nytimes_api'
 require_relative '../entities/nytimes_entity'
+require 'yaml'
+require 'fileutils'
 
 module WanderWise
-  # Mapper class for transforming raw NY Times article data into NYTimesEntity
+  # Mapper class for transforming API data into NYTimesEntity
   class NYTimesMapper
     def initialize(gateway)
       @gateway = gateway
     end
 
-    # Finds and returns an array of NYTimesEntity objects based on the search keyword
+    # Find and map articles to entity
     def find_articles(keyword)
-      # Fetch the raw articles data from the API using the gateway
       articles_data = @gateway.fetch_recent_articles(keyword)
 
-      # Map each article to an entity and return the array of NYTimesEntity objects
+      # Error handling for bad API responses
+      unless articles_data.is_a?(Hash) && articles_data['response'] && articles_data['response']['docs']
+        raise "Unexpected response from NYTimes API: #{articles_data.inspect}"
+      end
+
+      # Map the articles to entities
       articles_data['response']['docs'].map { |article_data| build_entity(article_data) }
+    end
+
+    def save_articles_to_yaml(keyword, file_path)
+      articles = find_articles(keyword)
+      FileUtils.mkdir_p(File.dirname(file_path)) unless Dir.exist?(File.dirname(file_path))
+
+      File.open(file_path, 'w') do |file|
+        file.write(articles.map(&:to_h).to_yaml)
+      end
+
+      articles
     end
 
     private
 
-    # Converts raw API article data into an NYTimesEntity object
     def build_entity(article_data)
-      # Extract relevant attributes from the raw data
-      attributes = {
+      NYTimesEntity.new(
         title: article_data.dig('headline', 'main'),
         published_date: article_data['pub_date'],
         url: article_data['web_url']
-      }
-
-      # Return the NYTimesEntity object with the extracted attributes
-      NYTimesEntity.new(attributes)
+      )
     end
   end
 end
