@@ -1,14 +1,19 @@
 # frozen_string_literal: true
 
+require 'http'
+require 'yaml'
+require 'json'
+require 'date'
+
 module WanderWise
-  # Handles all API requests to the NY Times API
+  # Gateway to NY Times API for recent articles
   class NYTimesAPI
-    # Initialize the API client
     def initialize
       @secrets = YAML.load_file('./config/secrets.yml')
       @api_key = @secrets['nytimes_api_key']
     end
 
+    # Fetch recent articles based on the keyword
     def fetch_recent_articles(keyword)
       today = DateTime.now
       one_week_ago = (today - 7).strftime('%Y%m%d')
@@ -21,28 +26,18 @@ module WanderWise
         'api-key' => @api_key
       }
 
+      # Return raw parsed JSON as a Ruby hash
       fetch_articles(base_url, params)
     end
 
     private
 
-    # Generate last week's date in the format required by the API
-
+    # Perform the API call and return the JSON response as a Ruby hash
     def fetch_articles(base_url, params)
       response = HTTP.get(base_url, params:)
-      status_code = response.status
 
-      if status_code == 200
-        articles = JSON.parse(response.body.to_s)['response']['docs']
-        articles.each do |article|
-          puts "Title: #{article.dig('headline', 'main') || 'No title'}"
-          puts "Published Date: #{article['pub_date'] || 'No date'}"
-          puts "URL: #{article['web_url'] || 'No URL'}"
-          puts '-' * 80
-        end
-      else
-        puts "Error: Unable to fetch articles. Status code: #{status_code}"
-      end
+      # Return the raw parsed JSON as a hash
+      JSON.parse(response.body.to_s)
     end
   end
 end
