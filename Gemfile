@@ -12,3 +12,7 @@ gem 'yaml'
 gem 'dry-struct'
 gem 'dry-types'
 gem 'rspec'
+gem 'roda'
+gem 'rack'
+gem 'tilt'
+
