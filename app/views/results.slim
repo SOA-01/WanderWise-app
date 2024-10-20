@@ -1,0 +1,34 @@
+doctype html
+html
+    head
+        title Flight Results
+        meta charset="utf-8"
+        meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    body
+        .container
+            h1.mt-4 Flight Results
+            - if flight_data
+                .list-group
+                    - flight_data.each do |flight|
+                        .list-group-item
+                            h5.mb-1 Flight from #{flight.origin_location_code} to #{flight.destination_location_code}
+                            p.mb-1
+                                | Departure Date: #{flight.departure_date} at #{flight.departure_time}
+                                br
+                                | Arrival Time: #{flight.arrival_time}
+                                br
+                                | Adults: #{flight.adults}
+                                br
+                                | Price: $#{flight.price || 'N/A'}
+                                br
+                                | Airline: #{flight.airline || 'N/A'}
+                                br
+                                | Flight Number: #{flight.flight_number || 'N/A'}
+                                br
+                                | Duration: #{flight.duration || 'N/A'}
+            - else
+                .alert.alert-warning.mt-4 No flights found.
+        script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"

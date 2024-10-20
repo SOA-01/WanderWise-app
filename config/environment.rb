@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
-require 'dotenv/load'
+require 'roda'
+require 'yaml'
 
-SECRETS = YAML.load_file(File.join(__dir__, 'secrets.yml'))
+module WanderWise
+  # Configuration for the WanderWise app
+  SECRETS = YAML.safe_load(File.read('config/secrets.yml'))
+end

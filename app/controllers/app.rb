@@ -1,30 +1,39 @@
 # frozen_string_literal: true
 
+require 'roda'
+require 'slim'
 require_relative '../models/gateways/flights_api'
 require_relative '../models/gateways/nytimes_api'
-require_relative '../models/mappers/flights_mapper'
-require_relative '../models/mappers/nytimes_mapper'
 
 module WanderWise
-  # Main class to run the application logic
-  class Main
-    def self.run
-      # ----- 1. Flight API -----
-      flight_mapper = WanderWise::FlightsMapper.new(WanderWise::FlightsAPI.new)
-      params = {
-        originLocationCode: 'TPE',
-        destinationLocationCode: 'LAX',
-        departureDate: '2024-10-29',
-        adults: 1
-      }
-      flight_mapper.save_flight_info_to_yaml(params, './spec/fixtures/flight-offers-results.yml')
+  # Main application class for WanderWise
+  class App < Roda
+    plugin :render, engine: 'slim', views: 'app/views'
+    plugin :assets, css: 'style.css', path: 'app/views/assets'
+    plugin :common_logger, $stderr
+    plugin :halt
 
-      # ----- 2. NY Times API -----
-      times_mapper = WanderWise::NYTimesMapper.new(WanderWise::NYTimesAPI.new)
-      times_mapper.save_articles_to_yaml('Taiwan', './spec/fixtures/nytimes-results.yml')
+    route do |routing|
+      routing.assets
+
+      # GET / request
+      routing.root do
+        view 'home'
+      end
+
+      # POST /submit request
+      routing.post 'submit' do
+        puts "Form submitted: #{routing.params}"
+        api = WanderWise::FlightsAPI.new
+        mapper = WanderWise::FlightsMapper.new(api)
+
+        begin
+          flight_data = mapper.find_flight(routing.params)
+          view 'results', locals: { flight_data: }
+        rescue StandardError => e
+          view 'error', locals: { message: e.message }
+        end
+      end
     end
   end
 end
-
-# To execute the application logic
-WanderWise::Main.run

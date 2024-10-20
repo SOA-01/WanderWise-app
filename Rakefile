@@ -17,7 +17,7 @@ task :spec do
 end
 
 task :run do
-  ruby 'app/controllers/app.rb'
+  ruby 'app/controllers/api_check.rb'
 end
 
 task default: :run
