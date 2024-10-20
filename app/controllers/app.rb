@@ -11,7 +11,6 @@ module WanderWise
   class App < Roda
     plugin :render, engine: 'slim', views: 'app/views'
     plugin :assets, css: 'style.css', path: 'app/views/assets'
-    plugin :common_logger, $stderr
     plugin :halt
 
     route do |routing|
@@ -24,7 +23,6 @@ module WanderWise
 
       # POST /submit request
       routing.post 'submit' do
-        puts "Form submitted: #{routing.params}"
         flights_api = WanderWise::FlightsAPI.new
         flight_mapper = WanderWise::FlightsMapper.new(flights_api)
         nytimes_api = WanderWise::NYTimesAPI.new

@@ -9,7 +9,7 @@ task :default do
 end
 
 task :test do
-  ruby 'spec/api_spec.rb'
+  sh 'rspec spec/app_spec.rb'
 end
 
 task :spec do

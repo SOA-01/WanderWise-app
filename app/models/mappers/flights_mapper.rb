@@ -6,7 +6,6 @@ require 'fileutils'
 module WanderWise
   # Mapper class for transforming API data into FlightsEntity
   class FlightsMapper
-    puts 'loaded'
     def initialize(gateway)
       @gateway = gateway
     end

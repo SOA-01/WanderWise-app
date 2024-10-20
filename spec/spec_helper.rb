@@ -6,8 +6,11 @@ require 'minitest/rg'
 require 'vcr'
 require 'webmock'
 
+require_relative '../app/controllers/app'
 require_relative '../app/models/gateways/flights_api'
 require_relative '../app/models/gateways/nytimes_api'
+require_relative '../app/models/mappers/flights_mapper'
+require_relative '../app/models/mappers/nytimes_mapper'
 require_relative '../app/models/entities/flights_entity'
 require_relative '../app/models/entities/nytimes_entity'
 
