@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 require 'rspec'
-require_relative '../lib/mappers/flights_mapper'
-require_relative '../lib/mappers/nytimes_mapper'
-require_relative '../lib/entities/flights_entity'
-require_relative '../lib/entities/nytimes_entity'
 require_relative 'spec_helper'
 
 RSpec.describe WanderWise::FlightsMapper do
