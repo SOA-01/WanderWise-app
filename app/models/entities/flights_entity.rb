@@ -14,10 +14,8 @@ module WanderWise
     attribute :origin_location_code, Types::String
     attribute :destination_location_code, Types::String
     attribute :departure_date, Types::String
-    attribute :adults, Types::Integer
     attribute :price, Types::Float.optional
     attribute :airline, Types::String.optional
-    attribute :flight_number, Types::String.optional
     attribute :duration, Types::String.optional
     attribute :departure_time, Types::String.optional
     attribute :arrival_time, Types::String.optional

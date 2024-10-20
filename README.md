@@ -1,34 +1,21 @@
 # WanderWise
 SOA 2024 UPSTART "Trip Planner"
 
-## Resources
-
-- 
-- 
-- 
-
-## Elements
-
--
--
--
-
 ## Entities
 
--
--
--
+- Flight
+- NY Times article
 
 # Install
 
-## Setting up the script
+## Setting up the project
 
 - Copy `secrets_example.yml` to `secrets.yml` and update API tokens
 - Ensure Ruby is updated
 - Run `bundle install`
 
-## Running the script
+## Running the project
 
 ```
-ruby lib/project_info.rb
+bundle exec puma
 ```

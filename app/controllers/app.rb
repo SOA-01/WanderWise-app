@@ -36,8 +36,8 @@ module WanderWise
 
           nytimes_articles = nytimes_mapper.find_articles(country)
           view 'results', locals: { flight_data:, country:, nytimes_articles: }
-        rescue StandardError => e
-          view 'error', locals: { message: e.message }
+        rescue StandardError => error
+          view 'error', locals: { message: error.message }
         end
       end
     end

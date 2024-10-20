@@ -5,7 +5,7 @@ require 'rake/testtask'
 CODE = 'app/controllers'
 
 task :default do
-  ruby 'app/controllers/app.rb'
+  sh 'bundle exec puma'
 end
 
 task :test do
@@ -15,12 +15,6 @@ end
 task :spec do
   ruby 'spec/spec_helper.rb'
 end
-
-task :run do
-  ruby 'app/controllers/api_check.rb'
-end
-
-task default: :run
 
 namespace :vcr do
   desc 'delete all cassettes'
