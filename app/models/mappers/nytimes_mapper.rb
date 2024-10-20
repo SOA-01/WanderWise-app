@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../gateways/nytimes_api'
-require_relative '../entities/nytimes_entity'
 require 'yaml'
 require 'fileutils'
 

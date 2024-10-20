@@ -1,13 +1,12 @@
 # frozen_string_literal: true
 
-require_relative '../gateways/flights_api'
-require_relative '../entities/flights_entity'
 require 'yaml'
 require 'fileutils'
 
 module WanderWise
   # Mapper class for transforming API data into FlightsEntity
   class FlightsMapper
+    puts "loaded"
     def initialize(gateway)
       @gateway = gateway
     end
