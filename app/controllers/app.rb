@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
+require_relative '../models/gateways/flights_api'
+require_relative '../models/gateways/nytimes_api'
+require_relative '../models/mappers/flights_mapper'
+require_relative '../models/mappers/nytimes_mapper'
+
 module WanderWise
+  # Main class to run the application logic
   class Main
     def self.run
       # ----- 1. Flight API -----
@@ -8,7 +14,7 @@ module WanderWise
       params = {
         originLocationCode: 'TPE',
         destinationLocationCode: 'LAX',
-        departureDate: '2024-10-19',
+        departureDate: '2024-10-29',
         adults: 1
       }
       flight_mapper.save_flight_info_to_yaml(params, './spec/fixtures/flight-offers-results.yml')

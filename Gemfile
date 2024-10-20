@@ -20,5 +20,3 @@ gem 'vcr'
 gem 'webmock'
 gem 'rake'
 gem 'pry'
-gem 'flog'
-

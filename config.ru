@@ -1,4 +1,6 @@
-require_relative 'require_app.rb'
+# frozen_string_literal: true
+
+require_relative 'require_app'
 require_app
 
 run WanderWise::App.freeze.app

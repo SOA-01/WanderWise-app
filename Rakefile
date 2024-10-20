@@ -2,10 +2,10 @@
 
 require 'rake/testtask'
 
-CODE = 'lib/'
+CODE = 'app/controllers'
 
 task :default do
-  ruby 'lib/main.rb'
+  ruby 'app/controllers/app.rb'
 end
 
 task :test do
@@ -17,7 +17,7 @@ task :spec do
 end
 
 task :run do
-  ruby 'lib/main.rb'
+  ruby 'app/controllers/app.rb'
 end
 
 task default: :run

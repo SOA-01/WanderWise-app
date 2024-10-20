@@ -3,6 +3,7 @@
 require 'http'
 require 'yaml'
 require 'json'
+require_relative '../entities/flights_entity'
 
 module WanderWise
   # Gateway to Amadeus API for flight offers data

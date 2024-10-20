@@ -3,6 +3,7 @@
 require 'dry-struct'
 require 'dry-types'
 
+# Define custom types for the Flight entity
 module Types
   include Dry.Types()
 end
