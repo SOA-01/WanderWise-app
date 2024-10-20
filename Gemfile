@@ -2,6 +2,7 @@
 
 source 'https://rubygems.org'
 
+gem 'airports'
 gem 'flog'
 gem 'http'
 gem 'json'

@@ -36,9 +36,8 @@ module WanderWise
     # Perform the API call and return the JSON response as a Ruby hash
     def fetch_articles(base_url, params)
       response = HTTP.get(base_url, params:)
-
-      # Return the raw parsed JSON as a hash
-      JSON.parse(response.body.to_s)
+      response_body = response.body.to_s.force_encoding('UTF-8')
+      JSON.parse(response_body)
     end
   end
 end

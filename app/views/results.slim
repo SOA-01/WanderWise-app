@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+
 doctype html
 html
     head
@@ -9,26 +11,51 @@ html
         .container
             h1.mt-4 Flight Results
             - if flight_data
-                .list-group
-                    - flight_data.each do |flight|
-                        .list-group-item
-                            h5.mb-1 Flight from #{flight.origin_location_code} to #{flight.destination_location_code}
-                            p.mb-1
-                                | Departure Date: #{flight.departure_date} at #{flight.departure_time}
-                                br
-                                | Arrival Time: #{flight.arrival_time}
-                                br
-                                | Adults: #{flight.adults}
-                                br
-                                | Price: $#{flight.price || 'N/A'}
-                                br
-                                | Airline: #{flight.airline || 'N/A'}
-                                br
-                                | Flight Number: #{flight.flight_number || 'N/A'}
-                                br
-                                | Duration: #{flight.duration || 'N/A'}
+                table.table.table-striped.mt-4
+                    thead
+                        tr
+                            th Origin
+                            th Destination
+                            th Departure Date
+                            th Departure Time
+                            th Arrival Time
+                            th Adults
+                            th Price ($)
+                            th Airline
+                            th Duration
+                    tbody
+                        - flight_data.each do |flight|
+                            tr
+                                td = flight.origin_location_code
+                                td = flight.destination_location_code
+                                td = flight.departure_date
+                                td = flight.departure_time || 'N/A'
+                                td = flight.arrival_time || 'N/A'
+                                td = flight.adults
+                                td = flight.price || 'N/A'
+                                td = flight.airline || 'N/A'
+                                td = flight.duration || 'N/A'
+
+                - if nytimes_articles.any?
+                    h2.mt-4 Related News Articles in #{country}
+                    table.table.table-hover.mt-4
+                        thead
+                            tr
+                                th Title
+                                th Published Date
+                                th Link
+                        tbody
+                            - nytimes_articles.each do |article|
+                                tr
+                                    td = article.title
+                                    td = article.published_date
+                                    td 
+                                        a href=article.url target="_blank" Read Article
+                - else
+                    p.mt-4 No related articles found for #{country}.
             - else
                 .alert.alert-warning.mt-4 No flights found.
+
         script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
         script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
