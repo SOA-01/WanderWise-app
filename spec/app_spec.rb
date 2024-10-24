@@ -2,12 +2,13 @@
 
 # frozen_string_literal: true
 
+require 'simplecov'
+SimpleCov.start
+
 require 'rspec'
 require 'rack/test'
 require 'vcr'
-require 'simplecov'
 require_relative 'spec_helper'
-SimpleCov.start
 
 ENV['RACK_ENV'] = 'test'
 
@@ -36,6 +37,8 @@ RSpec.describe WanderWise::App do # rubocop:disable Metrics/BlockLength
       get '/'
       expect(last_response).to be_ok
       expect(last_response.body).to include('Home')
+      expect(last_response.body).to include('<title>My Trip Planner</title>') # Check if the title element is present
+      expect(last_response.body).to include('form-horizontal') # Check if the form element is present
     end
   end
 

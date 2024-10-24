@@ -1,7 +1,7 @@
 {
   "RSpec": {
     "coverage": {
-      "/home/linux/Desktop/Service_Oriented_Architecture/Tripplanner/WanderWise/spec/spec_helper.rb": {
+      "/Users/maxadolfsson/utbyte/Kurser/SOA/Project/WanderWise/spec/spec_helper.rb": {
         "lines": [
           null,
           null,
@@ -28,7 +28,7 @@
           1
         ]
       },
-      "/home/linux/Desktop/Service_Oriented_Architecture/Tripplanner/WanderWise/app/controllers/app.rb": {
+      "/Users/maxadolfsson/utbyte/Kurser/SOA/Project/WanderWise/app/controllers/app.rb": {
         "lines": [
           null,
           null,
@@ -46,28 +46,28 @@
           1,
           null,
           1,
-          0,
+          3,
           null,
           null,
-          0,
-          0,
+          3,
+          1,
           null,
           null,
           null,
-          0,
-          0,
-          0,
-          0,
-          0,
+          2,
+          2,
+          2,
+          2,
+          2,
           null,
           null,
-          0,
-          0,
+          2,
+          1,
           null,
-          0,
-          0,
+          1,
+          1,
           null,
-          0,
+          1,
           null,
           null,
           null,
@@ -75,7 +75,7 @@
           null
         ]
       },
-      "/home/linux/Desktop/Service_Oriented_Architecture/Tripplanner/WanderWise/app/models/gateways/flights_api.rb": {
+      "/Users/maxadolfsson/utbyte/Kurser/SOA/Project/WanderWise/app/models/gateways/flights_api.rb": {
         "lines": [
           null,
           null,
@@ -122,7 +122,7 @@
           null
         ]
       },
-      "/home/linux/Desktop/Service_Oriented_Architecture/Tripplanner/WanderWise/app/models/entities/flights_entity.rb": {
+      "/Users/maxadolfsson/utbyte/Kurser/SOA/Project/WanderWise/app/models/entities/flights_entity.rb": {
         "lines": [
           null,
           null,
@@ -153,7 +153,7 @@
           null
         ]
       },
-      "/home/linux/Desktop/Service_Oriented_Architecture/Tripplanner/WanderWise/app/models/gateways/nytimes_api.rb": {
+      "/Users/maxadolfsson/utbyte/Kurser/SOA/Project/WanderWise/app/models/gateways/nytimes_api.rb": {
         "lines": [
           null,
           null,
@@ -167,38 +167,38 @@
           null,
           1,
           1,
-          1,
-          1,
+          0,
+          0,
           null,
           null,
           null,
           1,
+          0,
+          0,
+          0,
+          null,
+          null,
+          0,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          0,
+          null,
+          null,
+          null,
           1,
-          1,
-          1,
-          null,
-          null,
-          1,
-          null,
-          null,
-          null,
-          null,
-          null,
-          null,
-          1,
-          null,
-          null,
-          null,
-          1,
-          1,
-          1,
-          1,
+          0,
+          0,
+          0,
           null,
           null,
           null
         ]
       },
-      "/home/linux/Desktop/Service_Oriented_Architecture/Tripplanner/WanderWise/app/models/entities/nytimes_entity.rb": {
+      "/Users/maxadolfsson/utbyte/Kurser/SOA/Project/WanderWise/app/models/entities/nytimes_entity.rb": {
         "lines": [
           null,
           null,
@@ -224,7 +224,7 @@
           null
         ]
       },
-      "/home/linux/Desktop/Service_Oriented_Architecture/Tripplanner/WanderWise/app/models/mappers/flights_mapper.rb": {
+      "/Users/maxadolfsson/utbyte/Kurser/SOA/Project/WanderWise/app/models/mappers/flights_mapper.rb": {
         "lines": [
           null,
           null,
@@ -335,7 +335,7 @@
           null
         ]
       },
-      "/home/linux/Desktop/Service_Oriented_Architecture/Tripplanner/WanderWise/app/models/mappers/nytimes_mapper.rb": {
+      "/Users/maxadolfsson/utbyte/Kurser/SOA/Project/WanderWise/app/models/mappers/nytimes_mapper.rb": {
         "lines": [
           null,
           null,
@@ -411,6 +411,6 @@
         ]
       }
     },
-    "timestamp": 1729441384
+    "timestamp": 1729741115
   }
 }
