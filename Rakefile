@@ -10,6 +10,7 @@ end
 
 task :test do
   sh 'rspec spec/app_spec.rb'
+  sh 'rspec spec/api_spec.rb'
 end
 
 task :spec do

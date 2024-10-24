@@ -12,13 +12,16 @@ module WanderWise
     def initialize
       @secrets = YAML.load_file('./config/secrets.yml')
       @api_key = @secrets['nytimes_api_key']
+      @base_url = 'https://api.nytimes.com/svc/search/v2/articlesearch.json'
+
+      # Create a fixture file for the API response if it doesn't exist
+      save_to_fixtures unless File.exist?('./spec/fixtures/nytimes-api-results.yml')
     end
 
     # Fetch recent articles based on the keyword
     def fetch_recent_articles(keyword)
       today = DateTime.now
       one_week_ago = (today - 7).strftime('%Y%m%d')
-      base_url = 'https://api.nytimes.com/svc/search/v2/articlesearch.json'
 
       params = {
         'q' => keyword,
@@ -28,12 +31,18 @@ module WanderWise
       }
 
       # Return raw parsed JSON as a Ruby hash
-      self.class.fetch_articles(base_url, params)
+      fetch_articles(params)
+    end
+
+    def save_to_fixtures
+      articles = fetch_recent_articles('travel')
+
+      File.open('./spec/fixtures/nytimes-api-results.yml', 'w') { |file| file.write(articles.to_yaml) }
     end
 
     # Perform the API call and return the JSON response as a Ruby hash
-    def self.fetch_articles(base_url, params)
-      response = HTTP.get(base_url, params:)
+    def fetch_articles(params)
+      response = HTTP.get(@base_url, params:)
       response_body = response.body.to_s.force_encoding('UTF-8')
       JSON.parse(response_body)
     end
