@@ -5,7 +5,7 @@ require 'rake/testtask'
 CODE = 'app/controllers'
 
 task :default do
-  sh 'bundle exec puma'
+  sh 'RACK_ENV=development bundle exec puma'
 end
 
 # Run tests for a merged coverage report

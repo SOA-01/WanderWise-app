@@ -10,7 +10,9 @@ module WanderWise
   # Gateway to NY Times API for recent articles
   class NYTimesAPI
     def initialize
-      @secrets = YAML.load_file('./config/secrets.yml')
+      environment = ENV['RACK_ENV']
+      secrets = YAML.load_file('./config/secrets.yml')
+      @secrets = secrets[environment]
       @api_key = @secrets['nytimes_api_key']
       @base_url = 'https://api.nytimes.com/svc/search/v2/articlesearch.json'
 

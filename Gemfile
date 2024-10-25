@@ -4,6 +4,7 @@ source 'https://rubygems.org'
 
 gem 'airports'
 gem 'flog'
+gem 'figaro'
 gem 'http'
 gem 'json'
 gem 'rack-test'

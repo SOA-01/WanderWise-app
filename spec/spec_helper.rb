@@ -14,6 +14,8 @@ require_relative '../app/models/mappers/nytimes_mapper'
 require_relative '../app/models/entities/flights_entity'
 require_relative '../app/models/entities/nytimes_entity'
 
+ENV['RACK_ENV'] = 'test'
+
 curr_dir = __dir__
 CORRECT_NYT = YAML.load_file("#{curr_dir}/fixtures/nytimes-results.yml")
 CORRECT_FLIGHTS = YAML.load_file("#{curr_dir}/fixtures/flight-offers-results.yml")

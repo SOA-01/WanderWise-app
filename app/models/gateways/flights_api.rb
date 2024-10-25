@@ -9,7 +9,9 @@ module WanderWise
   # Gateway to Amadeus API for flight offers data
   class FlightsAPI
     def initialize
-      @secrets = YAML.load_file('./config/secrets.yml')
+      environment = ENV['RACK_ENV'] || 'development'
+      secrets = YAML.load_file('./config/secrets.yml')
+      @secrets = secrets[environment]
       @auth_data = authenticate
       @access_token = @auth_data['access_token']
 
