@@ -9,7 +9,7 @@ task :default do
 end
 
 # Run tests for a merged coverage report
-task :test do 
+task :test do
   sh 'COVERAGE=1 rspec spec/app_spec.rb'
   sh 'COVERAGE=1 rspec spec/api_spec.rb'
   sh 'COVERAGE=1 rspec spec/data_mapper_spec.rb'

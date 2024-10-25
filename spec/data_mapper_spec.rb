@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'simplecov'
 SimpleCov.start
 require 'rspec'
@@ -21,7 +22,6 @@ RSpec.describe WanderWise::FlightsMapper do
     VCR.eject_cassette
   end
 
-
   let(:gateway) { WanderWise::FlightsAPI.new }
   let(:mapper) { WanderWise::FlightsMapper.new(gateway) }
 
@@ -32,8 +32,7 @@ RSpec.describe WanderWise::FlightsMapper do
     it 'transforms API response into FlightsEntity object' do
       params = { originLocationCode: 'TPE', destinationLocationCode: 'LAX', departureDate: '2024-10-29', adults: 1 }
       
-      flight_entities = mapper.find_flight(params)
-      flight_entity = flight_entities.first
+      flight_entity = mapper.find_flight(params).first
 
       expect(flight_entity).to be_a(WanderWise::FlightsEntity)
       expect(flight_entity.origin_location_code).to eq(fixture_flight['data'].first.dig('itineraries', 0, 'segments', 0, 'departure', 'iataCode'))

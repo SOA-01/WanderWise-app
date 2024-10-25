@@ -25,7 +25,7 @@ RSpec.describe WanderWise::FlightsAPI do
 
   let(:flightsapi) { WanderWise::FlightsAPI.new }
 
-  #Get path through expanding the current directory 
+  # Get path through expanding the current directory
   curr_dir = __dir__
   let(:fixture_flight) { YAML.load_file("#{curr_dir}/fixtures/flight-api-results.yml") }
 
