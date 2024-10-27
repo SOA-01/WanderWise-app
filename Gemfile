@@ -23,3 +23,8 @@ gem 'vcr'
 gem 'webmock'
 gem 'rake'
 gem 'pry'
+gem 'sequel'
+gem 'sqlite3'
+gem 'hirb'
+gem 'hirb-unicode'
+
