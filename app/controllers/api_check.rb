@@ -14,7 +14,7 @@ module WanderWise
       params = {
         originLocationCode: 'TPE',
         destinationLocationCode: 'LAX',
-        departureDate: '2024-10-29',
+        departureDate: (Date.today + 7).strftime('%Y-%m-%d'),
         adults: 1
       }
       flight_mapper.save_flight_info_to_yaml(params, './spec/fixtures/flight-offers-results.yml')
@@ -27,4 +27,4 @@ module WanderWise
 end
 
 # To execute the application logic
-WanderWise::Main.run
+WanderWise::Main.run unless File.exist?('./spec/fixtures/flight-offers-results.yml') && File.exist?('./spec/fixtures/nytimes-results.yml')
