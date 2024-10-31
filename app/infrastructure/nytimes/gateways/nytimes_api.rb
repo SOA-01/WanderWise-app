@@ -4,7 +4,7 @@ require 'http'
 require 'yaml'
 require 'json'
 require 'date'
-require_relative '../entities/nytimes_entity'
+require_relative '../../../models/entities/article_entity'
 
 module WanderWise
   # Gateway to NY Times API for recent articles

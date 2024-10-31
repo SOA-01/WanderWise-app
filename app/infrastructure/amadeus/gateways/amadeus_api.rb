@@ -3,11 +3,11 @@
 require 'http'
 require 'yaml'
 require 'json'
-require_relative '../entities/flights_entity'
+require_relative '../../../models/entities/flight_entity.rb'
 
 module WanderWise
   # Gateway to Amadeus API for flight offers data
-  class FlightsAPI
+  class AmadeusAPI
     def initialize
       environment = ENV['RACK_ENV'] || 'development'
       secrets = YAML.load_file('./config/secrets.yml')
@@ -33,7 +33,7 @@ module WanderWise
 
       flight_offers = fetch_response({ 'originLocationCode' => 'TPE', 'destinationLocationCode' => 'LAX', 'departureDate' => date_next_week,
                                        'adults' => '1' })
-      File.open('./spec/fixtures/flight-api-results.yml', 'w') { |file| file.write(flight_offers.to_yaml) }
+      File.open('./spec/fixtures/amadeus-results.yml', 'w') { |file| file.write(flight_offers.to_yaml) }
     end
 
     private

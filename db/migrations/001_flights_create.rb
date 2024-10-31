@@ -9,6 +9,7 @@ Sequel.migration do
       Integer     :duration, null: false
       Time        :departure_time, null: false
       Time        :arrival_time, null: false
+      Date        :departure_date, null: false
     end
   end
 end

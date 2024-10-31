@@ -7,7 +7,7 @@ SimpleCov.start
 
 require_relative 'spec_helper'
 
-RSpec.describe WanderWise::FlightsAPI do
+RSpec.describe WanderWise::AmadeusAPI do
   VCR.configure do |c|
     c.cassette_library_dir = CASSETTES_FOLDER
     c.hook_into :webmock
@@ -23,7 +23,7 @@ RSpec.describe WanderWise::FlightsAPI do
     VCR.eject_cassette
   end
 
-  let(:flightsapi) { WanderWise::FlightsAPI.new }
+  let(:amadeus_api) { WanderWise::Amadeus.new }
 
   # Get path through expanding the current directory
   curr_dir = __dir__
@@ -33,7 +33,7 @@ RSpec.describe WanderWise::FlightsAPI do
 
   describe '#api call to amadeus', :vcr do
     it 'receives valid JSON response from the API' do
-      flight_offers = flightsapi.fetch_response(params)
+      flight_offers = amadeus_api.fetch_response(params)
 
       expect(flight_offers).not_to be_empty
 
@@ -59,14 +59,14 @@ RSpec.describe WanderWise::NYTimesAPI do
                         match_requests_on: %i[method uri body]
   end
 
-  let(:nytimesapi) { WanderWise::NYTimesAPI.new }
+  let(:nytimes_api) { WanderWise::NYTimesAPI.new }
 
   curr_dir = __dir__
   let(:fixture_articles) { YAML.load_file("#{curr_dir}/fixtures/nytimes-api-results.yml") }
 
   describe '#articles', :vcr do
     it 'gets valid JSON with articles' do
-      api_articles = nytimesapi.fetch_recent_articles('China')
+      api_articles = nytimes_api.fetch_recent_articles('China')
       expect(api_articles).not_to be_empty
 
       # flight_offers first element of data will be compared to the fixture yaml file in its structure

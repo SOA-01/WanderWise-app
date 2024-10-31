@@ -5,7 +5,7 @@ require 'fileutils'
 
 module WanderWise
   # Mapper class for transforming API data into FlightsEntity
-  class FlightsMapper
+  class FlightMapper
     def initialize(gateway)
       @gateway = gateway
     end
@@ -35,7 +35,7 @@ module WanderWise
     end
 
     def build_flights_entity(flight_data, segments)
-      FlightsEntity.new(
+      FlightEntity.new(
         origin_location_code: self.class.extract_origin(segments),
         destination_location_code: self.class.extract_destination(segments),
         departure_date: self.class.extract_departure_date(segments),

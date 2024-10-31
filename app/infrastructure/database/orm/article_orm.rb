@@ -2,11 +2,11 @@ require 'sequel'
 
 module WanderWise
   module Database
-    class NyTimeOrm < Sequel::Model(:nytimes)
+    class ArticleOrm < Sequel::Model(:articles)
       many_to_many :flights,
                    class: 'WanderWise::Database::FlightOrm',
-                   join_table: :flights_nytimes,
-                   left_key: :nytime_id,
+                   join_table: :flights_articles,
+                   left_key: :article_id,
                    right_key: :flight_id
     end
   end

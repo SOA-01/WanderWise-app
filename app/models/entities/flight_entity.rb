@@ -10,7 +10,7 @@ end
 
 module WanderWise
   # Domain entity for Flight data
-  class FlightsEntity < Dry::Struct
+  class FlightEntity < Dry::Struct
     attribute :origin_location_code, Types::String
     attribute :destination_location_code, Types::String
     attribute :departure_date, Types::String
