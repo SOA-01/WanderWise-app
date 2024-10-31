@@ -4,6 +4,7 @@
 
 require 'sequel'
 
+# Helper module for database operations
 module DatabaseHelper
   def self.wipe_database
     # Assuming `app.db` provides access to the Sequel database connection
