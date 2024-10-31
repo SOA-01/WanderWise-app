@@ -3,7 +3,7 @@
 require 'http'
 require 'yaml'
 require 'json'
-require_relative '../../../models/entities/flight.rb'
+require_relative '../../../models/entities/flight'
 
 module WanderWise
   # Gateway to Amadeus API for flight offers data
@@ -24,9 +24,7 @@ module WanderWise
       flight_offers_url = 'https://test.api.amadeus.com/v2/shopping/flight-offers'
       response = HTTP.auth("Bearer #{@access_token}")
                      .get(flight_offers_url, params:)
-      flight_offers = JSON.parse(response.body.to_s)
-
-      flight_offers
+      JSON.parse(response.body.to_s)
     end
 
     def save_to_fixtures

@@ -5,6 +5,7 @@ require_relative 'flights'
 
 module WanderWise
   module Repository
+    # Repository for Entities
     module For
       ENTITY_REPOSITORY = {
         Entity::Flight => Flights,

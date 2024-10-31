@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Sequel.migration do
   change do
     create_table(:flights) do
@@ -6,7 +8,7 @@ Sequel.migration do
       String      :destination_location_code
       Float       :price
       String      :airline, null: false
-      String     :duration, null: false
+      String      :duration, null: false
       Time        :departure_time, null: false
       Time        :arrival_time, null: false
       Date        :departure_date, null: false

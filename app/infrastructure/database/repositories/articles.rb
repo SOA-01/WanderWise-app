@@ -2,6 +2,7 @@
 
 module WanderWise
   module Repository
+    # Repository for Articles
     class Articles
       def self.find_id(id)
         rebuild_entity Database::ArticleOrm.where(id: id).all

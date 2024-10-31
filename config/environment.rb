@@ -16,14 +16,16 @@ module WanderWise
         path: File.expand_path('config/secrets.yml')
       )
       Figaro.load
-      def self.config() = Figaro.env
+      def self.config = Figaro.env
 
       configure :development, :test do
         ENV['DATABASE_URL'] = "sqlite://#{config.DB_FILENAME}"
       end
 
       @db = Sequel.connect(ENV['DATABASE_URL'])
-      def self.db() = @db
+      class << self
+        attr_reader :db
+      end
     end
     SECRETS = YAML.safe_load(File.read('config/secrets.yml'))
   end

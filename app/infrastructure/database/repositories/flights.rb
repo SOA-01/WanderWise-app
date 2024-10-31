@@ -2,6 +2,7 @@
 
 module WanderWise
   module Repository
+    # Repository for Flights
     class Flights
       def self.find_id(id)
         rebuild_entity Database::FlightOrm.where(id: id).all
@@ -11,7 +12,7 @@ module WanderWise
         rebuild_entity Database::FlightOrm.where(published_date: date).all
       end
 
-      def self.rebuild_entity(db_record)
+      def self.rebuild_entity(db_record) # rubocop:disable Metrics/MethodLength
         return nil unless db_record
 
         db_record.map do |record|
@@ -36,7 +37,7 @@ module WanderWise
       end
 
       def self.create(entity)
-        record = Database::FlightOrm.create(
+        Database::FlightOrm.create(
           origin_location_code: entity.origin_location_code,
           destination_location_code: entity.destination_location_code,
           departure_date: entity.departure_date,
