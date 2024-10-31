@@ -16,7 +16,7 @@ module WanderWise
       docs = ArticleDataExtractor.extract_docs(articles_data)
 
       # Map the articles to entities
-      docs.map { |article_data| ArticleEntityBuilder.build(article_data) }
+      docs.map { |article_data| ArticleBuilder.build(article_data) }
     end
 
     def save_articles_to_yaml(keyword, file_path)
@@ -38,9 +38,9 @@ module WanderWise
   end
 
   # Builder class for ArticleEntity
-  class ArticleEntityBuilder
+  class ArticleBuilder
     def self.build(article_data)
-      ArticleEntity.new(
+      Article.new(
         title: article_data.dig('headline', 'main'),
         published_date: article_data['pub_date'],
         url: article_data['web_url']

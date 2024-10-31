@@ -10,7 +10,7 @@ end
 
 module WanderWise
   # Domain entity for NY Times articles
-  class ArticleEntity < Dry::Struct
+  class Article < Dry::Struct
     attribute :title, Types::String
     attribute :published_date, Types::String
     attribute :url, Types::String

@@ -49,7 +49,7 @@ RSpec.describe WanderWise::App do # rubocop:disable Metrics/BlockLength
     let(:article_mapper) { instance_double(WanderWise::ArticleMapper) }
     let(:params) { { 'originLocationCode' => 'TPE', 'destinationLocationCode' => 'LAX', 'departureDate' => '2024-10-29', 'adults' => '1' } }
     let(:flight_data) do
-      [instance_double(WanderWise::FlightEntity,
+      [instance_double(WanderWise::Flight,
                        destination_location_code: 'LAX',
                        origin_location_code: 'TPE',
                        departure_date: '2024-10-29',
@@ -61,7 +61,7 @@ RSpec.describe WanderWise::App do # rubocop:disable Metrics/BlockLength
     end
     let(:country) { 'USA' }
     let(:nytimes_articles) do
-      [instance_double(WanderWise::ArticleEntity,
+      [instance_double(WanderWise::Article,
                        title: 'Example Article Title',
                        published_date: '2024-10-19',
                        url: 'https://example.com/article')]

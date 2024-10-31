@@ -5,6 +5,7 @@ require 'slim'
 require 'airports'
 require_relative '../infrastructure/amadeus/gateways/amadeus_api'
 require_relative '../infrastructure/nytimes/gateways/nytimes_api'
+require_relative '../infrastructure/database/repositories/flights.rb'
 
 module WanderWise
   # Main application class for WanderWise
@@ -31,7 +32,7 @@ module WanderWise
         begin
           flight_data = flight_mapper.find_flight(routing.params)
           country = Airports.find_by_iata_code(flight_data.first.destination_location_code).country
-
+          Repository::For.klass(Entity::Flight).create_many(flight_data)
           nytimes_articles = article_mapper.find_articles(country)
           view 'results', locals: { flight_data:, country:, nytimes_articles: }
         rescue StandardError => error

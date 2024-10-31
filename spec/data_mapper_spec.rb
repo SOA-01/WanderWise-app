@@ -32,11 +32,11 @@ RSpec.describe WanderWise::FlightMapper do
     it 'transforms API response into FlightsEntity object' do
       params = { originLocationCode: 'TPE', destinationLocationCode: 'LAX', departureDate: '2024-10-29', adults: 1 }
       
-      flight_entity = mapper.find_flight(params).first
+      flight = mapper.find_flight(params).first
 
-      expect(flight_entity).to be_a(WanderWise::FlightsEntity)
-      expect(flight_entity.origin_location_code).to eq(fixture_flight['data'].first.dig('itineraries', 0, 'segments', 0, 'departure', 'iataCode'))
-      expect(flight_entity.destination_location_code).to eq(fixture_flight['data'].first.dig('itineraries', 0, 'segments', -1, 'arrival', 'iataCode'))
+      expect(flight).to be_a(WanderWise::Flight)
+      expect(flight.origin_location_code).to eq(fixture_flight['data'].first.dig('itineraries', 0, 'segments', 0, 'departure', 'iataCode'))
+      expect(flight.destination_location_code).to eq(fixture_flight['data'].first.dig('itineraries', 0, 'segments', -1, 'arrival', 'iataCode'))
     end
   end
 end
@@ -68,7 +68,7 @@ RSpec.describe WanderWise::ArticleMapper do
       articles = mapper.find_articles('Taiwan')
       
       expect(articles).to be_an(Array)
-      expect(articles.first).to be_a(WanderWise::ArticleEntity)
+      expect(articles.first).to be_a(WanderWise::Article)
       # expect(articles.first.title).to eq(fixture_articles.first.dig('headline', 'main'))
       # expect(articles.first.published_date).to eq(fixture_articles.first['pub_date'])
       # expect(articles.first.url).to eq(fixture_articles.first['web_url'])

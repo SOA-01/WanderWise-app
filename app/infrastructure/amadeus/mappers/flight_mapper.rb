@@ -35,7 +35,7 @@ module WanderWise
     end
 
     def build_flights_entity(flight_data, segments)
-      FlightEntity.new(
+      Flight.new(
         origin_location_code: self.class.extract_origin(segments),
         destination_location_code: self.class.extract_destination(segments),
         departure_date: self.class.extract_departure_date(segments),
