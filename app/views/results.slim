@@ -33,6 +33,33 @@ html
                                 td = flight.price || 'N/A'
                                 td = flight.airline || 'N/A'
                                 td = flight.duration || 'N/A'
+                
+                - if historical_lowest_data
+                    h2.mt-4 Historical Lowest Price
+                    table.table.table-hover.mt-4
+                        thead
+                            tr
+                                th Date
+                                th Price ($)
+                        tbody
+                            tr
+                                td = historical_lowest_data.departure_date
+                                td = historical_lowest_data.price
+                - else
+                    p.mt-4 No historical data found.
+                
+                - if historical_average_data
+                    h2.mt-4 Historical Average Price
+                    table.table.table-hover.mt-4
+                        thead
+                            tr
+                                th Price ($)
+                        tbody
+                            tr
+                                td = historical_average_data
+
+                - else
+                    p.mt-4 No historical data found.
 
                 - if nytimes_articles.any?
                     h2.mt-4 Related News Articles in #{country}

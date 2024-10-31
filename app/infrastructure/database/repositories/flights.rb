@@ -68,6 +68,14 @@ module WanderWise
       def self.delete(id)
         Database::FlightOrm.where(id: id).delete
       end
+
+      def self.find_best_price_from_to(origin_location_code, destination_location_code)
+        Database::FlightOrm.where(origin_location_code: origin_location_code, destination_location_code: destination_location_code).order(:price).first
+      end
+
+      def self.find_average_price_from_to(origin_location_code, destination_location_code)
+        Database::FlightOrm.where(origin_location_code: origin_location_code, destination_location_code: destination_location_code).avg(:price)
+      end
     end
   end
 end

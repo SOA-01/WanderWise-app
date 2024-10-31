@@ -32,9 +32,21 @@ module WanderWise
         begin
           flight_data = flight_mapper.find_flight(routing.params)
           country = Airports.find_by_iata_code(flight_data.first.destination_location_code).country
+
           Repository::For.klass(Entity::Flight).create_many(flight_data)
+
+          historical_lowest_data = Repository::For.klass(Entity::Flight).
+            find_best_price_from_to(flight_data.first.origin_location_code, 
+              flight_data.first.destination_location_code)
+
+          historical_average_data = Repository::For.klass(Entity::Flight).
+            find_average_price_from_to(flight_data.first.origin_location_code,
+              flight_data.first.destination_location_code).round(2)
+          
           nytimes_articles = article_mapper.find_articles(country)
-          view 'results', locals: { flight_data:, country:, nytimes_articles: }
+
+          view 'results', locals: { flight_data:, country:, nytimes_articles:, 
+            historical_lowest_data:, historical_average_data: }
         rescue StandardError => error
           view 'error', locals: { message: error.message }
         end
