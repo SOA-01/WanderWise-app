@@ -4,8 +4,8 @@ require 'yaml'
 require 'fileutils'
 
 module WanderWise
-  # Mapper class for transforming API data into NYTimesEntity
-  class NYTimesMapper
+  # Mapper class for transforming API data into ArticlesEntity
+  class ArticleMapper
     def initialize(gateway)
       @gateway = gateway
     end
@@ -13,10 +13,10 @@ module WanderWise
     # Find and map articles to entity
     def find_articles(keyword)
       articles_data = fetch_articles_data(keyword)
-      docs = ArticlesDataExtractor.extract_docs(articles_data)
+      docs = ArticleDataExtractor.extract_docs(articles_data)
 
       # Map the articles to entities
-      docs.map { |article_data| NYTimesEntityBuilder.build(article_data) }
+      docs.map { |article_data| ArticleBuilder.build(article_data) }
     end
 
     def save_articles_to_yaml(keyword, file_path)
@@ -37,10 +37,10 @@ module WanderWise
     end
   end
 
-  # Builder class for NYTimesEntity
-  class NYTimesEntityBuilder
+  # Builder class for ArticleEntity
+  class ArticleBuilder
     def self.build(article_data)
-      NYTimesEntity.new(
+      Article.new(
         title: article_data.dig('headline', 'main'),
         published_date: article_data['pub_date'],
         url: article_data['web_url']
@@ -49,7 +49,7 @@ module WanderWise
   end
 
   # Extractor class for articles data
-  class ArticlesDataExtractor
+  class ArticleDataExtractor
     def self.extract_docs(articles_data)
       response = articles_data['response']
       docs = response['docs']

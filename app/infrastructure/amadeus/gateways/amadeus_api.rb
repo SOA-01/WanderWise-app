@@ -3,26 +3,36 @@
 require 'http'
 require 'yaml'
 require 'json'
-require_relative '../entities/flights_entity'
+require_relative '../../../models/entities/flight'
 
 module WanderWise
   # Gateway to Amadeus API for flight offers data
-  class FlightsAPI
+  class AmadeusAPI
     def initialize
-      @secrets = YAML.load_file('./config/secrets.yml')
+      environment = ENV['RACK_ENV'] || 'development'
+      secrets = YAML.load_file('./config/secrets.yml')
+      @secrets = secrets[environment]
       @auth_data = authenticate
       @access_token = @auth_data['access_token']
+
+      # Create a fixture file for the API response if it doesn't exist
+      save_to_fixtures unless File.exist?('./spec/fixtures/flight-api-results.yml')
     end
 
     # Fetch flight offers based on the provided parameters
     def fetch_response(params)
       flight_offers_url = 'https://test.api.amadeus.com/v2/shopping/flight-offers'
-
       response = HTTP.auth("Bearer #{@access_token}")
                      .get(flight_offers_url, params:)
-
-      # Return the raw parsed JSON as a Ruby hash
       JSON.parse(response.body.to_s)
+    end
+
+    def save_to_fixtures
+      date_next_week = (Date.today + 7).to_s # Find date of next week and convert to string
+
+      flight_offers = fetch_response({ 'originLocationCode' => 'TPE', 'destinationLocationCode' => 'LAX', 'departureDate' => date_next_week,
+                                       'adults' => '1' })
+      File.open('./spec/fixtures/amadeus-results.yml', 'w') { |file| file.write(flight_offers.to_yaml) }
     end
 
     private
@@ -35,7 +45,6 @@ module WanderWise
                              client_id: @secrets['amadeus_client_id'],
                              client_secret: @secrets['amadeus_client_secret']
                            })
-
       # Return authentication details as a hash
       JSON.parse(response.body.to_s)
     end
