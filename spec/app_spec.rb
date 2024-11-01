@@ -12,6 +12,7 @@ require_relative 'spec_helper'
 
 ENV['RACK_ENV'] = 'test'
 
+# Mock the Airport class
 class Airport
   attr_reader :country
 
