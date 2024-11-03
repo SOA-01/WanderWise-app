@@ -1,5 +1,6 @@
 # WanderWise
-SOA 2024 UPSTART "Trip Planner"
+The application's purpose is to help users searching for flight deals to get relevant extra info on the side. We fetch news articles regarding the destination from external API, and serve info based on previous searches, stored in our database.
+
 
 ## Entities
 
