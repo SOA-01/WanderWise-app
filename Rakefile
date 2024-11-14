@@ -7,7 +7,7 @@ CODE = 'app/controllers'
 # Default task for Puma
 task :default do
   if ENV['RACK_ENV'] == 'production'
-    sh 'bundle exec puma -C config/puma.rb'
+    sh 'bundle exec puma'
   else
     sh 'RACK_ENV=development bundle exec puma'
   end
