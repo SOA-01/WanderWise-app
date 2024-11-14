@@ -2,6 +2,7 @@
 
 require 'http'
 require 'json'
+require 'yaml'
 require_relative '../../../models/entities/flight'
 
 module WanderWise
@@ -10,15 +11,21 @@ module WanderWise
     def initialize
       environment = ENV['RACK_ENV'] || 'development'
       
+      # Only load secrets from secrets.yml in development/test environments
       if environment == 'development' || environment == 'test'
-        secrets = YAML.load_file('./config/secrets.yml')
-        @client_id = secrets[environment]['amadeus_client_id']
-        @client_secret = secrets[environment]['amadeus_client_secret']
+        secrets_file_path = './config/secrets.yml'
+        if File.exist?(secrets_file_path)
+          secrets = YAML.load_file(secrets_file_path)
+          @client_id = secrets[environment]['amadeus_client_id']
+          @client_secret = secrets[environment]['amadeus_client_secret']
+        else
+          raise "secrets.yml file not found for #{environment} environment."
+        end
       else
+        # For production, use environment variables
         @client_id = ENV['AMADEUS_CLIENT_ID']
         @client_secret = ENV['AMADEUS_CLIENT_SECRET']
       end
-      
 
       if @client_id.nil? || @client_secret.nil?
         raise 'AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET must be set in environment variables'
