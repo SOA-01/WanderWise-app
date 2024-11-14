@@ -11,22 +11,32 @@ module WanderWise
     plugin :environments
 
     configure do
-      Figaro.application = Figaro::Application.new(
-        environment: environment,
-        path: File.expand_path('config/secrets.yml')
-      )
-      Figaro.load
-      def self.config = Figaro.env
+      if environment == :production
+        # In production, use environment variables directly
+        def self.config
+          OpenStruct.new(
+            amadeus_client_id: ENV['amadeus_client_id'],
+            amadeus_client_secret: ENV['amadeus_client_secret'],
+            nytimes_api_key: ENV['nytimes_api_key'],
+            database_url: ENV['DATABASE_URL']
+          )
+        end
+      else
+        # For non-production environments, load secrets from YAML file
+        Figaro.application = Figaro::Application.new(
+          environment: environment,
+          path: File.expand_path('config/secrets.yml')
+        )
+        Figaro.load
+        def self.config = Figaro.env
 
-      configure :development, :test do
-        ENV['DATABASE_URL'] = "sqlite://#{config.DB_FILENAME}"
+        ENV['DATABASE_URL'] ||= "sqlite://#{config.DB_FILENAME}"
       end
 
-      @db = Sequel.connect(ENV['DATABASE_URL'])
+      @db = Sequel.connect(config.database_url || ENV['DATABASE_URL'])
       class << self
         attr_reader :db
       end
     end
-    SECRETS = YAML.safe_load(File.read('config/secrets.yml'))
   end
 end
