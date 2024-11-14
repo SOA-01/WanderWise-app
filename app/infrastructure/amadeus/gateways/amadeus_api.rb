@@ -23,8 +23,8 @@ module WanderWise
         end
       else
         # For production, use environment variables
-        @client_id = ENV['AMADEUS_CLIENT_ID']
-        @client_secret = ENV['AMADEUS_CLIENT_SECRET']
+        @client_id = ENV['amadeus_client_id']
+        @client_secret = ENV['amaedus_client_secret']
       end
 
       if @client_id.nil? || @client_secret.nil?
