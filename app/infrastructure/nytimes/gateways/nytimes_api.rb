@@ -16,7 +16,7 @@ module WanderWise
       # Load secrets from environment variables for production or from secrets.yml for development
       if environment == 'production'
         # In production, use environment variables for API keys
-        @api_key = ENV['NYTIMES_API_KEY']
+        @api_key = ENV['nytimes_api_key']
         raise 'NYTIMES_API_KEY environment variable is missing!' if @api_key.nil?
       else
         # In non-production environments, load from secrets.yml
