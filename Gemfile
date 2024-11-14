@@ -26,3 +26,8 @@ gem 'pry'
 gem 'sequel'
 gem 'sqlite3'
 gem 'hirb'
+gem 'logger'
+
+group :production do
+  gem 'pg'
+end

@@ -7,3 +7,6 @@ coverage/*
 spec/coverage/*
 !spec/coverage/.resultset.json
 .DS_Store
+.bundle/
+db/local/dev.db
+db/local/test.db
