@@ -4,15 +4,28 @@ require 'rake/testtask'
 
 CODE = 'app/controllers'
 
+# Default task for Puma
 task :default do
-  sh 'RACK_ENV=development bundle exec puma'
+  if ENV['RACK_ENV'] == 'production'
+    sh 'bundle exec puma'
+  else
+    sh 'RACK_ENV=development bundle exec puma'
+  end
 end
 
 # Run tests for a merged coverage report
 task :test do
-  sh 'COVERAGE=1 rspec spec/app_spec.rb'
-  sh 'COVERAGE=1 rspec spec/api_spec.rb'
-  sh 'COVERAGE=1 rspec spec/data_mapper_spec.rb'
+  if ENV['RACK_ENV'] == 'production'
+    puts "Running tests in production mode"
+    sh 'RACK_ENV=production COVERAGE=1 rspec spec/app_spec.rb'
+    sh 'RACK_ENV=production COVERAGE=1 rspec spec/api_spec.rb'
+    sh 'RACK_ENV=production COVERAGE=1 rspec spec/data_mapper_spec.rb'
+  else
+    puts "Running tests in development mode"
+    sh 'RACK_ENV=development COVERAGE=1 rspec spec/app_spec.rb'
+    sh 'RACK_ENV=development COVERAGE=1 rspec spec/api_spec.rb'
+    sh 'RACK_ENV=development COVERAGE=1 rspec spec/data_mapper_spec.rb'
+  end
 end
 
 task :spec do
@@ -40,7 +53,7 @@ namespace :quality do
   end
 end
 
-namespace :db do # rubocop:disable Metrics/BlockLength
+namespace :db do
   task :config do
     require 'sequel'
     require_relative 'config/environment' # load config info
