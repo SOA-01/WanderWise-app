@@ -185,6 +185,7 @@ DEPENDENCIES
   http
   json
   logger
+  pg
   pry
   puma
   rack (~> 2.2)
