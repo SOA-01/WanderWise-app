@@ -28,6 +28,7 @@ gem 'sqlite3'
 gem 'hirb'
 gem 'rack', '~> 2.2'
 gem 'logger'
+gem 'ostruct'
 
 group :production do
   gem 'pg'
