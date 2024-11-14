@@ -4,7 +4,6 @@ require 'roda'
 require 'yaml'
 require 'figaro'
 require 'sequel'
-require 'ostruct'
 
 module WanderWise
   # Configuration for the WanderWise app
@@ -19,7 +18,8 @@ module WanderWise
             amadeus_client_id: ENV['amadeus_client_id'],
             amadeus_client_secret: ENV['amadeus_client_secret'],
             nytimes_api_key: ENV['nytimes_api_key'],
-            database_url: ENV['DATABASE_URL']
+            database_url: ENV['DATABASE_URL'],
+            SESSION_SECRET: ENV['SESSION_SECRET']
           )
         end
       else

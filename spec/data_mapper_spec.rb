@@ -22,23 +22,30 @@ RSpec.describe WanderWise::FlightMapper do
     VCR.eject_cassette
   end
 
-  let(:gateway) { WanderWise::Amadeus.new }
+  let(:gateway) { WanderWise::AmadeusAPI.new }
   let(:mapper) { WanderWise::FlightMapper.new(gateway) }
 
   curr_dir = __dir__
-  let(:fixture_flight) { YAML.load_file("#{curr_dir}/fixtures/flight-api-results.yml") }
+  let(:fixture_flight) { YAML.load_file("#{curr_dir}/fixtures/amadeus-results.yml") }
 
   describe '#find_flight' do
     it 'transforms API response into FlightsEntity object' do
-      params = { originLocationCode: 'TPE', destinationLocationCode: 'LAX', departureDate: '2024-10-29', adults: 1 }
+      # Load data from the fixture and structure it to match the API response format
+      fixture_data = { 'data' => fixture_flight['data'] }
+      allow(gateway).to receive(:fetch_response).and_return(fixture_data)
+
+      date_next_week = (Date.today + 7).to_s
+      params = { originLocationCode: 'TPE', destinationLocationCode: 'LAX', departureDate: date_next_week, adults: 1 }
       
       flight = mapper.find_flight(params).first
 
       expect(flight).to be_a(WanderWise::Flight)
-      expect(flight.origin_location_code).to eq(fixture_flight['data'].first.dig('itineraries', 0, 'segments', 0, 'departure', 'iataCode'))
-      expect(flight.destination_location_code).to eq(fixture_flight['data'].first.dig('itineraries', 0, 'segments', -1, 'arrival', 'iataCode'))
+      expect(flight.origin_location_code).to eq(fixture_data['data'].first.dig('itineraries', 0, 'segments', 0, 'departure', 'iataCode'))
+      expect(flight.destination_location_code).to eq(fixture_data['data'].first.dig('itineraries', 0, 'segments', -1, 'arrival', 'iataCode'))
     end
   end
+
+  
 end
 
 RSpec.describe WanderWise::ArticleMapper do
@@ -48,9 +55,7 @@ RSpec.describe WanderWise::ArticleMapper do
   end
 
   before do
-    VCR.insert_cassette CASSETTE_FILE_NYT,
-                        record: :new_episodes,
-                        match_requests_on: %i[method uri body]
+    VCR.insert_cassette "nyt_api_#{Time.now.to_i}", record: :new_episodes, match_requests_on: %i[method uri body]
   end
 
   after do

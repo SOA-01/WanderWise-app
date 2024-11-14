@@ -1,23 +1,31 @@
-.container
-  form class="form-horizontal" action="/submit" method="post"
-    label class="control-label" for="originLocationCode"
-      | Origin Location Code:
-    input class="form-control" type="text" id="originLocationCode" name="originLocationCode" value=(session[:originLocationCode] || "TPE")
-    br
+doctype html
+html
+  head
+    title WanderWise
+    == assets :css
+  body
+    .container
+      == render 'flash_bar'
 
-    label class="control-label" for="destinationLocationCode"
-      | Destination Location Code:
-    input class="form-control" type="text" id="destinationLocationCode" name="destinationLocationCode" value=(session[:destinationLocationCode] || "LAX")
-    br
+      form.form-horizontal action="/submit" method="post"
+        label.control-label for="originLocationCode"
+          | Origin Location Code:
+        input.form-control type="text" id="originLocationCode" name="originLocationCode" value="TPE"
+        br
 
-    label class="control-label" for="departureDate"
-      | Departure Date:
-    input class="form-control" type="text" id="departureDate" name="departureDate" value=(session[:departureDate] || "2024-11-05")
-    br
+        label.control-label for="destinationLocationCode"
+          | Destination Location Code:
+        input.form-control type="text" id="destinationLocationCode" name="destinationLocationCode" value="LAX"
+        br
 
-    label class="control-label" for="adults"
-      | Number of Adults:
-    input class="form-control" type="number" id="adults" name="adults" value=(session[:adults] || 1)
-    br
+        label.control-label for="departureDate"
+          | Departure Date:
+        input.form-control type="text" id="departureDate" name="departureDate" value="2024-11-05"
+        br
 
-    input class="btn btn-primary" type="submit" value="Submit"
+        label.control-label for="adults"
+          | Number of Adults:
+        input.form-control type="number" id="adults" name="adults" value="1"
+        br
+
+        input.btn.btn-primary type="submit" value="Submit"

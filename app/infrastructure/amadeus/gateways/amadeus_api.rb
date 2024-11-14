@@ -8,24 +8,19 @@ require_relative '../../../models/entities/flight'
 module WanderWise
   # Gateway to Amadeus API for flight offers data
   class AmadeusAPI
+    class AmadeusAPIError < StandardError; end
     def initialize
       environment = ENV['RACK_ENV'] || 'development'
       
-      # Only load secrets from secrets.yml in development/test environments
       if environment == 'development' || environment == 'test'
-        secrets_file_path = './config/secrets.yml'
-        if File.exist?(secrets_file_path)
-          secrets = YAML.load_file(secrets_file_path)
-          @client_id = secrets[environment]['amadeus_client_id']
-          @client_secret = secrets[environment]['amadeus_client_secret']
-        else
-          raise "secrets.yml file not found for #{environment} environment."
-        end
+        secrets = YAML.load_file('./config/secrets.yml')
+        @client_id = secrets[environment]['amadeus_client_id']
+        @client_secret = secrets[environment]['amadeus_client_secret']
       else
-        # For production, use environment variables
-        @client_id = ENV['amadeus_client_id']
-        @client_secret = ENV['amadeus_client_secret']
+        @client_id = ENV['AMADEUS_CLIENT_ID']
+        @client_secret = ENV['AMADEUS_CLIENT_SECRET']
       end
+      
 
       if @client_id.nil? || @client_secret.nil?
         raise 'AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET must be set in environment variables'
@@ -35,16 +30,32 @@ module WanderWise
       @access_token = @auth_data['access_token']
 
       # Create a fixture file for the API response if it doesn't exist
-      save_to_fixtures unless File.exist?('./spec/fixtures/flight-api-results.yml')
+      save_to_fixtures unless File.exist?('./spec/fixtures/amadeus-results.yml')
     end
 
     # Fetch flight offers based on the provided parameters
     def fetch_response(params)
       flight_offers_url = 'https://test.api.amadeus.com/v2/shopping/flight-offers'
+      
       response = HTTP.auth("Bearer #{@access_token}")
                      .get(flight_offers_url, params: params)
-      JSON.parse(response.body.to_s)
+    
+      # Check for a successful response
+      if response.status != 200
+        raise AmadeusAPIError, "Error fetching flight data: #{response.status} - #{response.body}"
+      end
+    
+      begin
+        flight_offers = JSON.parse(response.body.to_s)
+        
+        flight_offers['data'] ||= []
+        
+        flight_offers
+      rescue JSON::ParserError => e
+        raise AmadeusAPIError, "Failed to parse API response: #{e.message}"
+      end
     end
+    
 
     def save_to_fixtures
       date_next_week = (Date.today + 7).to_s # Find date of next week and convert to string
@@ -68,8 +79,15 @@ module WanderWise
         client_id: @client_id,
         client_secret: @client_secret
       })
-      # Return authentication details as a hash
-      JSON.parse(response.body.to_s)
+      if response.status != 200
+        raise AmadeusAPIError, "Authentication failed: #{response.status} - #{response.body}"
+      end
+
+      begin
+        JSON.parse(response.body.to_s)
+      rescue JSON::ParserError => e
+        raise AmadeusAPIError, "Failed to parse authentication response: #{e.message}"
+      end
     end
   end
 end

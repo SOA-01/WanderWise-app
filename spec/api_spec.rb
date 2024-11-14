@@ -6,61 +6,94 @@ require 'simplecov'
 SimpleCov.start
 
 require_relative 'spec_helper'
+require_relative '../app/infrastructure/database/repositories/for'
+require_relative '../app/infrastructure/database/repositories/flights'
+require_relative '../app/infrastructure/database/repositories/articles'
+require_relative '../app/infrastructure/database/repositories/entity'
 
 RSpec.describe WanderWise::AmadeusAPI do
   VCR.configure do |c|
-    c.cassette_library_dir = CASSETTES_FOLDER
+    c.cassette_library_dir = 'spec/fixtures/cassettes'
     c.hook_into :webmock
   end
 
   before do
-    VCR.insert_cassette CASSETTE_FILE_FLIGHTS,
-                        record: :new_episodes,
-                        match_requests_on: %i[method uri body]
+    VCR.insert_cassette 'amadeus-results', record: :new_episodes, match_requests_on: %i[method uri body]
   end
 
   after do
     VCR.eject_cassette
   end
 
-  let(:amadeus_api) { WanderWise::AmadeusAPI.new } 
+  let(:amadeus_api) { WanderWise::AmadeusAPI.new }
 
   # Get path through expanding the current directory
   curr_dir = __dir__
-  let(:fixture_flight) { YAML.load_file("#{curr_dir}/fixtures/flight-api-results.yml") }
-
-  params = { 'originLocationCode' => 'TPE', 'destinationLocationCode' => 'LAX', 'departureDate' => '2024-10-29', 'adults' => '1' }
+  let(:fixture_flight) { YAML.load_file(File.join(File.dirname(__FILE__), 'fixtures', 'amadeus-results.yml')) }
+  date_next_week = (Date.today + 7).to_s
+  params = { 'originLocationCode' => 'TPE', 'destinationLocationCode' => 'LAX', 'departureDate' => date_next_week, 'adults' => '1' }
 
   describe '#api call to Amadeus', :vcr do
     it 'receives valid JSON response from the API' do
       flight_offers = amadeus_api.fetch_response(params)
 
-      expect(flight_offers).not_to be_empty
+      # Assert that there are flight offers
+      expect(flight_offers['data']).not_to be_empty, "No flight offers available for the given parameters"
 
-      # Compare the API response with the fixture
+      # Proceed with the test if flight offers are present
       api_offer = flight_offers['data'].first
       fixture_offer = fixture_flight['data'].first
 
-      # Check if first 5 keys match
-      expect(api_offer.keys[0..4]).to eq(fixture_offer.keys[0..4])
+      # Check that the first key in the response matches with the fixture (we'll check 'id' and 'source' as an example)
+      expect(api_offer['id']).to eq(fixture_offer['id'])
+      expect(api_offer['source']).to eq(fixture_offer['source'])
+
+      # Check the first itinerary segment (departure and arrival)
+      itinerary = api_offer['itineraries'].first
+      fixture_itinerary = fixture_offer['itineraries'].first
+
+      expect(itinerary['duration']).to eq(fixture_itinerary['duration'])
+
+      segment = itinerary['segments'].first
+      fixture_segment = fixture_itinerary['segments'].first
+
+      expect(segment['departure']['iataCode']).to eq(fixture_segment['departure']['iataCode'])
+      expect(segment['arrival']['iataCode']).to eq(fixture_segment['arrival']['iataCode'])
     end
   end
 end
 
-# Test for FlightMapper class (if applicable)
-RSpec.describe WanderWise::FlightMapper do
-  let(:amadeus_api) { WanderWise::AmadeusAPI.new }
-  let(:flight_mapper) { WanderWise::FlightMapper.new(amadeus_api) } 
+RSpec.describe WanderWise::NYTimesAPI do
+  VCR.configure do |c|
+    c.cassette_library_dir = 'spec/fixtures/cassettes'
+    c.hook_into :webmock
+  end
 
-  params = { 'originLocationCode' => 'TPE', 'destinationLocationCode' => 'LAX', 'departureDate' => '2024-10-29', 'adults' => '1' }
+  before do
+    VCR.insert_cassette 'nytimes-api-results', record: :new_episodes, match_requests_on: %i[method uri body]
+  end
+
+  after do
+    VCR.eject_cassette
+  end
 
   describe '#find_flight' do
     it 'returns an array of sorted flight entities' do
       flights = flight_mapper.find_flight(params)
 
-      expect(flights).to be_an(Array)
-      expect(flights).not_to be_empty
-      expect(flights.first).to be_a(WanderWise::Flight)
+  curr_dir = __dir__
+  let(:fixture_articles) { YAML.load_file("#{curr_dir}/fixtures/nytimes-api-results.yml") }
+
+  describe '#articles', :vcr do
+    it 'gets valid JSON with articles' do
+      api_articles = nytimes_api.fetch_recent_articles('China')
+      expect(api_articles).not_to be_empty
+
+      api_example = api_articles['response']['docs'].first
+      fixture_example = fixture_articles['response']['docs'].first
+
+      # Adjust the expected keys to match the actual response structure
+      expect(api_example.keys[0..4]).to eq(fixture_example.keys[0..4])
     end
   end
 end
