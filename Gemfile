@@ -27,3 +27,8 @@ gem 'sequel'
 gem 'sqlite3'
 gem 'hirb'
 gem 'rack', '~> 2.2'
+gem 'logger'
+
+group :production do
+  gem 'pg'
+end
