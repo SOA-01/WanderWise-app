@@ -12,13 +12,15 @@ module WanderWise
     def initialize
       environment = ENV['RACK_ENV'] || 'development'
       
+      # Only load secrets from secrets.yml in development/test environments
       if environment == 'development' || environment == 'test'
+        secrets_file_path = './config/secrets.yml'
         secrets = YAML.load_file('./config/secrets.yml')
         @client_id = secrets[environment]['amadeus_client_id']
         @client_secret = secrets[environment]['amadeus_client_secret']
       else
-        @client_id = ENV['AMADEUS_CLIENT_ID']
-        @client_secret = ENV['AMADEUS_CLIENT_SECRET']
+        @client_id = ENV['amadeus_client_id']
+        @client_secret = ENV['amadeus_client_secret']
       end
       
 
