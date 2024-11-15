@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'roda'
 require 'slim'
 require 'figaro'
@@ -9,6 +11,7 @@ require_relative '../infrastructure/database/repositories/flights'
 require 'logger'  # Add this line to require Logger
 
 module WanderWise
+  # Main application class for WanderWise
   class App < Roda
     plugin :flash
     plugin :render, engine: 'slim', views: 'app/views'
