@@ -9,6 +9,7 @@ require_relative '../../../models/entities/article'
 module WanderWise
   # Gateway to NY Times API for recent articles
   class NYTimesAPI
+    class Error < StandardError; end
     def initialize
       # Set the environment from RACK_ENV or default to development
       environment = ENV['RACK_ENV'] || 'development'
@@ -20,21 +21,25 @@ module WanderWise
         raise 'NYTIMES_API_KEY environment variable is missing!' if @api_key.nil?
       else
         # In non-production environments, load from secrets.yml
-        secrets = load_secrets
-        @api_key = secrets[environment]['nytimes_api_key']
+        environment = ENV['RACK_ENV']
+        secrets = YAML.load_file('./config/secrets.yml')
+        @secrets = secrets[environment]
+        @api_key = @secrets['nytimes_api_key']
+        @base_url = 'https://api.nytimes.com/svc/search/v2/articlesearch.json'
       end
-    class Error < StandardError; end
+      save_to_fixtures unless File.exist?('./spec/fixtures/nytimes-api-results.yml') || environment == 'production'
+    end
 
+=begin
     def initialize
       environment = ENV['RACK_ENV']
       secrets = YAML.load_file('./config/secrets.yml')
       @secrets = secrets[environment]
       @api_key = @secrets['nytimes_api_key']
-      @base_url = 'https://api.nytimes.com/svc/search/v2/articlesearch.json'
+=end
 
       # Create a fixture file for the API response if it doesn't exist in development/test
-      save_to_fixtures unless File.exist?('./spec/fixtures/nytimes-api-results.yml') || environment == 'production'
-    end
+      
 
     # Fetch recent articles based on the keyword
     def fetch_recent_articles(keyword)
@@ -66,7 +71,12 @@ module WanderWise
       end
 
       response_body = response.body.to_s.force_encoding('UTF-8')
-      JSON.parse(response_body)
+      begin
+        parsed_response = JSON.parse(response_body)
+        parsed_response['response'] && parsed_response['response']['docs'] ? parsed_response : { 'response' => { 'docs' => [] } }
+      rescue JSON::ParserError => e
+        raise Error, "Error parsing NY Times response: #{e.message}"
+      end
 
     # Load secrets from secrets.yml for development/test environments
     def load_secrets

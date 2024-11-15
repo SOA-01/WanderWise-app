@@ -8,7 +8,7 @@ require 'securerandom'
 require_relative '../infrastructure/amadeus/gateways/amadeus_api'
 require_relative '../infrastructure/nytimes/gateways/nytimes_api'
 require_relative '../infrastructure/database/repositories/flights'
-require 'logger'  # Add this line to require Logger
+require 'logger'
 
 module WanderWise
   # Main application class for WanderWise
@@ -41,12 +41,6 @@ module WanderWise
 
       # GET / request
       routing.root do
-        # Initialize session data for form values if not already set
-        session[:originLocationCode] ||= 'TPE'
-        session[:destinationLocationCode] ||= 'LAX'
-        session[:departureDate] ||= '2024-11-05'
-        session[:adults] ||= 1
-
         view 'home'
       end
 
@@ -125,55 +119,6 @@ module WanderWise
           session[:flash] = flash.to_hash
           routing.redirect '/'  # Do not redirect immediately after setting flash
         end
-
-        # Step 4: Get destination country
-        country = nil
-        begin
-          destination_code = flight_data.first.destination_location_code
-          country = Airports.find_by_iata_code(destination_code)&.country
-          if country.nil?
-            flash[:notice] = 'Country information not found for the destination.'
-            routing.redirect '/'
-          end
-        rescue StandardError => error
-          flash[:error] = "Error retrieving country information: #{error.message}"
-          routing.redirect '/'
-        end
-
-        # Step 5: Store flight data in the database
-        begin
-          Repository::For.klass(Entity::Flight).create_many(flight_data)
-        rescue StandardError => error
-          flash[:error] = "Error saving flight data: #{error.message}"
-          routing.redirect '/'
-        end
-
-        # Step 6: Get historical pricing data
-        begin
-          origin_code = flight_data.first.origin_location_code
-          lowest_data = Repository::For.klass(Entity::Flight).find_best_price_from_to(origin_code, destination_code)
-          average_data = Repository::For.klass(Entity::Flight).find_average_price_from_to(origin_code, destination_code).round(2)
-        rescue StandardError => error
-          flash[:notice] = 'Historical pricing data unavailable.'
-          lowest_data, average_data = nil, nil
-        end
-
-        # Step 7: Get news articles from NY Times API
-        nytimes_articles = []
-        begin
-          nytimes_articles = article_mapper.find_articles(country)
-        rescue StandardError => error
-          flash[:notice] = 'News articles could not be retrieved at this time.'
-        end
-
-        # Step 8: Display results
-        view 'results', locals: {
-          flight_data: flight_data,
-          country: country,
-          nytimes_articles: nytimes_articles,
-          historical_lowest_data: lowest_data,
-          historical_average_data: average_data
-        }
       end
     end
   end

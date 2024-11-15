@@ -32,6 +32,14 @@ task :spec do
   ruby 'spec/spec_helper.rb'
 end
 
+task :new_session_secret do
+  require 'base64'
+  require 'securerandom'
+  
+  secret = SecureRandom.random_bytes(64).then { Base64.urlsafe_encode64(_1) }
+  puts "SESSION_SECRET: #{secret}"
+end
+
 namespace :vcr do
   desc 'delete all cassettes'
   task :delete do

@@ -77,9 +77,7 @@ RSpec.describe WanderWise::NYTimesAPI do
     VCR.eject_cassette
   end
 
-  describe '#find_flight' do
-    it 'returns an array of sorted flight entities' do
-      flights = flight_mapper.find_flight(params)
+  let(:nytimes_api) { WanderWise::NYTimesAPI.new }
 
   curr_dir = __dir__
   let(:fixture_articles) { YAML.load_file("#{curr_dir}/fixtures/nytimes-api-results.yml") }

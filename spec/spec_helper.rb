@@ -19,9 +19,6 @@ require_relative '../app/models/entities/flight'
 require_relative '../app/models/entities/article'
 require_relative 'database_helper'
 
-ENV['SESSION_SECRET'] = Figaro.env.SESSION_SECRET
-ENV['RACK_ENV'] ||= 'test'
-
 ENV['RACK_ENV'] = 'test'
 ENV['SESSION_SECRET'] = 'test_secret_key'
 

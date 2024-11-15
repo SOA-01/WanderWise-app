@@ -52,8 +52,6 @@ module WanderWise
   class ArticleDataExtractor
     def self.extract_docs(articles_data)
       response = articles_data['response']
-      puts "API Response: #{response.inspect}"
-      docs = response && response['docs'] || []
       docs = response['docs']
 
       # Error handling for bad API responses
