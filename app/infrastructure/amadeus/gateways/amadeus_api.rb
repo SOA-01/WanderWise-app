@@ -33,7 +33,7 @@ module WanderWise
       
 
       if @client_id.nil? || @client_secret.nil?
-        raise 'AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET must be set in environment variables'
+        raise 'amadeus_client_id and amadeus_client_secret must be set in environment variables'
       end
 
       @auth_data = authenticate
