@@ -28,7 +28,7 @@ gem 'sqlite3'
 gem 'hirb'
 gem 'logger'
 gem 'dotenv'
-gem 'obstruct'
+gem 'ostruct'
 
 group :production do
   gem 'pg'
