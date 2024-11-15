@@ -4,6 +4,7 @@ require 'roda'
 require 'yaml'
 require 'figaro'
 require 'sequel'
+require 'ostruct'
 
 module WanderWise
   # Configuration for the WanderWise app
