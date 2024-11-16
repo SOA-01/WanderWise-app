@@ -16,12 +16,12 @@ end
 # Run tests for a merged coverage report
 task :test do
   if ENV['RACK_ENV'] == 'production'
-    puts "Running tests in production mode"
+    puts 'Running tests in production mode'
     sh 'RACK_ENV=production COVERAGE=1 rspec spec/app_spec.rb'
     sh 'RACK_ENV=production COVERAGE=1 rspec spec/api_spec.rb'
     sh 'RACK_ENV=production COVERAGE=1 rspec spec/data_mapper_spec.rb'
   else
-    puts "Running tests in development mode"
+    puts 'Running tests in development mode'
     sh 'RACK_ENV=development COVERAGE=1 rspec spec/app_spec.rb'
     sh 'RACK_ENV=development COVERAGE=1 rspec spec/api_spec.rb'
     sh 'RACK_ENV=development COVERAGE=1 rspec spec/data_mapper_spec.rb'
@@ -35,7 +35,6 @@ end
 task :new_session_secret do
   require 'base64'
   require 'securerandom'
-  
   secret = SecureRandom.random_bytes(64).then { Base64.urlsafe_encode64(_1) }
   puts "SESSION_SECRET: #{secret}"
 end
@@ -61,7 +60,7 @@ namespace :quality do
   end
 end
 
-namespace :db do
+namespace :db do # rubocop:disable Metrics/BlockLength
   task :config do
     require 'sequel'
     require_relative 'config/environment' # load config info

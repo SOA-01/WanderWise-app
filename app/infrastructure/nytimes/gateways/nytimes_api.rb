@@ -10,7 +10,8 @@ module WanderWise
   # Gateway to NY Times API for recent articles
   class NYTimesAPI
     class Error < StandardError; end
-    def initialize
+
+    def initialize # rubocop:disable Metrics/MethodLength
       # Set the environment from RACK_ENV or default to development
       environment = ENV['RACK_ENV'] || 'development'
 
@@ -25,21 +26,18 @@ module WanderWise
         secrets = YAML.load_file('./config/secrets.yml')
         @secrets = secrets[environment]
         @api_key = @secrets['nytimes_api_key']
-        @base_url = 'https://api.nytimes.com/svc/search/v2/articlesearch.json'
       end
+      @base_url = 'https://api.nytimes.com/svc/search/v2/articlesearch.json'
       save_to_fixtures unless File.exist?('./spec/fixtures/nytimes-api-results.yml') || environment == 'production'
     end
 
-=begin
-    def initialize
-      environment = ENV['RACK_ENV']
-      secrets = YAML.load_file('./config/secrets.yml')
-      @secrets = secrets[environment]
-      @api_key = @secrets['nytimes_api_key']
-=end
+    #     def initialize
+    #       environment = ENV['RACK_ENV']
+    #       secrets = YAML.load_file('./config/secrets.yml')
+    #       @secrets = secrets[environment]
+    #       @api_key = @secrets['nytimes_api_key']
 
-      # Create a fixture file for the API response if it doesn't exist in development/test
-      
+    # Create a fixture file for the API response if it doesn't exist in development/test
 
     # Fetch recent articles based on the keyword
     def fetch_recent_articles(keyword)
@@ -64,11 +62,9 @@ module WanderWise
     end
 
     # Perform the API call and return the JSON response as a Ruby hash
-    def fetch_articles(params)
+    def fetch_articles(params) # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
       response = HTTP.get(@base_url, params:)
-      if response.status != 200
-        raise Error, "Failed to fetch articles from NY Times: #{response.status}"
-      end
+      raise Error, "Failed to fetch articles from NY Times: #{response.status}" if response.status != 200
 
       response_body = response.body.to_s.force_encoding('UTF-8')
       begin
@@ -77,14 +73,6 @@ module WanderWise
       rescue JSON::ParserError => e
         raise Error, "Error parsing NY Times response: #{e.message}"
       end
-
-    # Load secrets from secrets.yml for development/test environments
-    def load_secrets
-      secrets_file_path = './config/secrets.yml'
-      raise "secrets.yml file not found" unless File.exist?(secrets_file_path)
-
-      YAML.load_file(secrets_file_path)
-    end
     rescue JSON::ParserError => e
       raise Error, "Error parsing NY Times response: #{e.message}"
     rescue StandardError => e

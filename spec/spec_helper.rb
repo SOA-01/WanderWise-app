@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'simplecov'
 SimpleCov.start
 require 'dotenv'
@@ -10,7 +11,7 @@ require 'vcr'
 require 'webmock'
 require 'rack/test'
 
-require_relative '../app/controllers/app.rb'
+require_relative '../app/controllers/app'
 require_relative '../app/infrastructure/amadeus/gateways/amadeus_api'
 require_relative '../app/infrastructure/nytimes/gateways/nytimes_api'
 require_relative '../app/infrastructure/amadeus/mappers/flight_mapper'

@@ -12,30 +12,10 @@ module WanderWise
 
     # Find and map flight data to entity
     def find_flight(params)
-      flight_data = @gateway.fetch_response(params) 
-      if flight_data['data'].nil? || flight_data['data'].empty?
-        raise 'No flight data available'  
-      end
-    
-      flight_data['data'].map do |flight|
-        departure_time = flight.dig('itineraries', 0, 'segments', 0, 'departure', 'at')
-        price = flight.dig('price', 'total')
-        airline = flight.dig('itineraries', 0, 'segments', 0, 'carrierCode')
-        duration = flight.dig('itineraries', 0, 'duration')
-        arrival_time = flight.dig('itineraries', 0, 'segments', 0, 'arrival', 'at')
-        destination_location_code = flight.dig('itineraries', 0, 'segments', -1, 'arrival', 'iataCode')
-        WanderWise::Flight.new(
-          origin_location_code: flight.dig('itineraries', 0, 'segments', 0, 'departure', 'iataCode'),
-          destination_location_code: destination_location_code,
-          departure_date: departure_time.split('T').first,
-          price: price.to_f,
-          airline: airline,
-          duration: duration,
-          departure_time: departure_time.split('T').last,
-          arrival_time: arrival_time.split('T').last
-        )
-      end
-    end   
+      flight_data = @gateway.fetch_response(params)
+      flights = flight_data['data'].map { |flight| build_entity(flight) }.compact # Remove nil entries
+      flights.sort_by { |flight| Time.parse("#{flight.departure_date}T#{flight.departure_time}") }
+    end
 
     def save_flight_info_to_yaml(params, file_path)
       flight_entities = find_flight(params)

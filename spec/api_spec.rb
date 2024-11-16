@@ -11,7 +11,7 @@ require_relative '../app/infrastructure/database/repositories/flights'
 require_relative '../app/infrastructure/database/repositories/articles'
 require_relative '../app/infrastructure/database/repositories/entity'
 
-RSpec.describe WanderWise::AmadeusAPI do
+RSpec.describe WanderWise::AmadeusAPI do # rubocop:disable Metrics/BlockLength
   VCR.configure do |c|
     c.cassette_library_dir = 'spec/fixtures/cassettes'
     c.hook_into :webmock
@@ -28,7 +28,7 @@ RSpec.describe WanderWise::AmadeusAPI do
   let(:amadeus_api) { WanderWise::AmadeusAPI.new }
 
   # Get path through expanding the current directory
-  curr_dir = __dir__
+  __dir__
   let(:fixture_flight) { YAML.load_file(File.join(File.dirname(__FILE__), 'fixtures', 'amadeus-results.yml')) }
   date_next_week = (Date.today + 7).to_s
   params = { 'originLocationCode' => 'TPE', 'destinationLocationCode' => 'LAX', 'departureDate' => date_next_week, 'adults' => '1' }
@@ -38,7 +38,7 @@ RSpec.describe WanderWise::AmadeusAPI do
       flight_offers = amadeus_api.fetch_response(params)
 
       # Assert that there are flight offers
-      expect(flight_offers['data']).not_to be_empty, "No flight offers available for the given parameters"
+      expect(flight_offers['data']).not_to be_empty, 'No flight offers available for the given parameters'
 
       # Proceed with the test if flight offers are present
       api_offer = flight_offers['data'].first

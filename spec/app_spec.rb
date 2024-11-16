@@ -20,14 +20,14 @@ class Airport
   end
 end
 
-RSpec.describe WanderWise::App do
+RSpec.describe WanderWise::App do # rubocop:disable Metrics/BlockLength
   include Rack::Test::Methods
 
   def app
     WanderWise::App.app
   end
 
-  VCR.configure do |c| 
+  VCR.configure do |c|
     c.cassette_library_dir = 'spec/cassettes'
     c.hook_into :webmock
   end
@@ -42,7 +42,7 @@ RSpec.describe WanderWise::App do
     end
   end
 
-  describe 'POST /submit' do
+  describe 'POST /submit' do # rubocop:disable Metrics/BlockLength
     let(:amadeus_api) { instance_double(WanderWise::AmadeusAPI) }
     let(:flight_mapper) { instance_double(WanderWise::FlightMapper) }
     let(:nytimes_api) { instance_double(WanderWise::NYTimesAPI) }
@@ -52,7 +52,6 @@ RSpec.describe WanderWise::App do
     let(:mock_data_for_lowest) { { price: 200, airline: 'MockAirline' } }
     let(:mock_data_for_average) { 250 }
 
-  
     let(:flight_data) do
       [instance_double(WanderWise::Flight,
                        destination_location_code: 'LAX',
@@ -71,7 +70,7 @@ RSpec.describe WanderWise::App do
                        published_date: '2024-10-19',
                        url: 'https://example.com/article')]
     end
-  
+
     before do
       allow(WanderWise::AmadeusAPI).to receive(:new).and_return(amadeus_api)
       allow(WanderWise::FlightMapper).to receive(:new).with(amadeus_api).and_return(flight_mapper)
@@ -83,24 +82,22 @@ RSpec.describe WanderWise::App do
       allow_any_instance_of(WanderWise::Repository::Flights).to receive(:fetch_historical_lowest_data).and_return(mock_data_for_lowest)
       allow_any_instance_of(WanderWise::Repository::Flights).to receive(:fetch_historical_average_data).and_return(mock_data_for_average)
     end
-    
-  
+
     it 'stores flight search data in session' do
       post '/submit', params, 'rack.session' => { watching: [] }
       expect(last_request.session[:watching]).not_to be_empty
       expect(last_request.session[:watching].last[:origin]).to eq('TPE')
       expect(last_request.session[:watching].last[:destination]).to eq('LAX')
-    end    
-  
+    end
+
     it 'renders the error view on exception' do
       allow(flight_mapper).to receive(:find_flight).and_raise(StandardError.new('Test error'))
       post '/submit', params, 'rack.session' => {}, 'rack.flash' => {}
-      expect(last_response.status).to eq(302)  # Expect a redirect
-      expect(last_response.headers['Location']).to eq('/')  # Expect a redirect to the root
-    end    
-  
-    it "processes the form submission and renders the results view" do
+      expect(last_response.status).to eq(302) # Expect a redirect
+      expect(last_response.headers['Location']).to eq('/') # Expect a redirect to the root
+    end
 
+    it 'processes the form submission and renders the results view' do
       flight_params = {
         adults: '1',
         departureDate: (Date.today + 7).to_s,
@@ -109,13 +106,10 @@ RSpec.describe WanderWise::App do
       }
 
       post '/submit', flight_params
-    
-      if last_response.status == 302  # Check if a redirect is happening
-        follow_redirect!
-      end
-    
+
+      follow_redirect! if last_response.status == 302 # Check if a redirect is happening
+
       expect(last_response.body).to include('My Trip Planner')
-    end  
+    end
   end
-  
 end

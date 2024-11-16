@@ -6,7 +6,7 @@ require 'rspec'
 require_relative 'spec_helper'
 require 'vcr'
 
-RSpec.describe WanderWise::FlightMapper do
+RSpec.describe WanderWise::FlightMapper do # rubocop:disable Metrics/BlockLength
   VCR.configure do |c| 
     c.cassette_library_dir = CASSETTES_FOLDER
     c.hook_into :webmock
