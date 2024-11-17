@@ -2,6 +2,7 @@
 
 require_relative 'entity'
 require_relative 'flights'
+require_relative 'articles'
 
 module WanderWise
   module Repository

@@ -1,23 +1,31 @@
-.container
-    form class="form-horizontal" action="/submit" method="post"
-        label class="control-label" for="originLocationCode"
-            | Origin Location Code:
-        input class="form-control" type="text" id="originLocationCode" name="originLocationCode" value="TPE"
+doctype html
+html
+  head
+    title WanderWise
+    == assets :css
+  body
+    .container
+      == render 'flash_bar'
+
+      form.form-horizontal action="/submit" method="post"
+        label.control-label for="originLocationCode"
+          | Origin Location Code:
+        input.form-control type="text" id="originLocationCode" name="originLocationCode" value="TPE"
         br
-        
-        label class="control-label" for="destinationLocationCode"
-            | Destination Location Code:
-        input class="form-control" type="text" id="destinationLocationCode" name="destinationLocationCode" value="LAX"
+
+        label.control-label for="destinationLocationCode"
+          | Destination Location Code:
+        input.form-control type="text" id="destinationLocationCode" name="destinationLocationCode" value="LAX"
         br
-        
-        label class="control-label" for="departureDate"
-            | Departure Date:
-        input class="form-control" type="text" id="departureDate" name="departureDate" value="2024-11-05"
+
+        label.control-label for="departureDate"
+          | Departure Date:
+        input.form-control type="text" id="departureDate" name="departureDate" value="2024-11-05"
         br
-        
-        label class="control-label" for="adults"
-            | Number of Adults:
-        input class="form-control" type="number" id="adults" name="adults" value="1"
+
+        label.control-label for="adults"
+          | Number of Adults:
+        input.form-control type="number" id="adults" name="adults" value="1"
         br
-        
-        input class="btn btn-primary" type="submit" value="Submit"
+
+        input.btn.btn-primary type="submit" value="Submit"

@@ -27,6 +27,7 @@ gem 'sequel'
 gem 'sqlite3'
 gem 'hirb'
 gem 'logger'
+gem 'dotenv'
 gem 'ostruct'
 
 group :production do
