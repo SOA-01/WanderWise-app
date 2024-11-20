@@ -15,11 +15,9 @@ module WanderWise
       def find_articles(input)
         input = articles_from_news_api(input)
 
-        return Failure('Could not find articles.') if input.failure?
-
         Success(input.value!)
       rescue StandardError
-        Failure(error.to_s)
+        Failure('No articles found for the given criteria.')
       end
 
       def articles_from_news_api(input)

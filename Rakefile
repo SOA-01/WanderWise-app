@@ -42,7 +42,7 @@ end
 namespace :vcr do
   desc 'delete all cassettes'
   task :delete do
-    rm_rf 'spec/fixtures/cassettes'
+    rm_rf 'spec/cassettes'
   end
 end
 

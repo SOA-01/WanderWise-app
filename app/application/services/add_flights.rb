@@ -15,11 +15,13 @@ module WanderWise
       private
 
       def find_flights(input)
-        input = flights_from_amadeus(input)
+        result = flights_from_amadeus(input)
 
-        Success(input)
+        return result if result.failure?
+
+        Success(result.value!)
       rescue StandardError
-        Failure('Could not find flights')
+        Failure('Could not find flight data')
       end
 
       def store_flights(input)
@@ -35,11 +37,9 @@ module WanderWise
         flight_mapper = FlightMapper.new(amadeus_api)
         flight_data = flight_mapper.find_flight(input)
 
-        if flight_data.empty? || flight_data.nil?
-          Failure('No flights found for the given criteria.')
-        else
-          Success(flight_data)
-        end
+        return Failure('No flights found for the given criteria.') if flight_data.empty? || flight_data.nil?
+
+        Success(flight_data)
       end
     end
   end
