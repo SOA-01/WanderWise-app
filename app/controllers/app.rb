@@ -90,9 +90,15 @@ module WanderWise
         article_mapper = WanderWise::ArticleMapper.new(nytimes_api)
         nytimes_articles = article_mapper.find_articles(country)
 
+        # Step 6: Ask AI for opinion on the destination
+        gemini_api = WanderWise::GeminiAPI.new
+        gemini_mapper = WanderWise::GeminiMapper.new(gemini_api)
+        gemini_answer = gemini_mapper.find_gemini_data("Tell me about #{country}")
+        binding.irb
+
         # Render the results view with all gathered data
         view 'results', locals: {
-          flight_data:, country:, nytimes_articles:,
+          flight_data:, country:, nytimes_articles:, gemini_answer:,
           historical_lowest_data:, historical_average_data:
         }
       rescue WanderWise::AmadeusAPI::AmadeusAPIError => e
