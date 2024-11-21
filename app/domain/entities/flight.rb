@@ -20,9 +20,5 @@ module WanderWise
     attribute :duration, Types::String.optional
     attribute :departure_time, Types::String.optional
     attribute :arrival_time, Types::String.optional
-
-    def flight_summary
-      "Flight from #{origin_location_code} to #{destination_location_code} on #{departure_date} for #{adults} adult(s)."
-    end
   end
 end

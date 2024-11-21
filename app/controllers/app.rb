@@ -14,8 +14,8 @@ module WanderWise
   # Main application class for WanderWise
   class App < Roda
     plugin :flash
-    plugin :render, engine: 'slim', views: 'app/views'
-    plugin :assets, css: 'style.css', path: 'app/views/assets'
+    plugin :render, engine: 'slim', views: 'app/presentation/views_html'
+    plugin :assets, css: 'style.css', path: 'app/presentation/assets'
     plugin :halt
     plugin :sessions, secret: ENV['SESSION_SECRET']
 
@@ -90,6 +90,9 @@ module WanderWise
         article_mapper = WanderWise::ArticleMapper.new(nytimes_api)
         nytimes_articles = article_mapper.find_articles(country)
 
+        retrieved_flights = Views::FlightList.new(flight_data)
+        retrieved_articles = Views::ArticleList.new(nytimes_articles)
+
         # Step 6: Ask AI for opinion on the destination
         gemini_api = WanderWise::GeminiAPI.new
         gemini_mapper = WanderWise::GeminiMapper.new(gemini_api)
@@ -101,7 +104,7 @@ module WanderWise
 
         # Render the results view with all gathered data
         view 'results', locals: {
-          flight_data:, country:, nytimes_articles:, gemini_answer:,
+          flight_data: retrieved_flights, country:, nytimes_articles: retrieved_articles, gemini_answer:,
           historical_lowest_data:, historical_average_data:
         }
       rescue WanderWise::AmadeusAPI::AmadeusAPIError => e
