@@ -34,6 +34,12 @@ html
                                 td = flight.airline || 'N/A'
                                 td = flight.duration || 'N/A'
                 
+                - if gemini_answer
+                    h2.mt-4 Related AI response: 
+                    | #{gemini_answer}
+                - else
+                    p.mt-4 No gemini_answer.
+                    
                 - if historical_lowest_data
                     h2.mt-4 Historical Lowest Price
                     table.table.table-hover.mt-4
@@ -78,6 +84,7 @@ html
                                         a href=article.url target="_blank" Read Article
                 - else
                     p.mt-4 No related articles found for #{country}.
+                
             - else
                 .alert.alert-warning.mt-4 No flights found.
 
