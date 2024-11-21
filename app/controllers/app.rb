@@ -93,8 +93,11 @@ module WanderWise
         # Step 6: Ask AI for opinion on the destination
         gemini_api = WanderWise::GeminiAPI.new
         gemini_mapper = WanderWise::GeminiMapper.new(gemini_api)
-        gemini_answer = gemini_mapper.find_gemini_data("Tell me about #{country}")
-        binding.irb
+
+        month = routing.params['departureDate'].split('-')[1].to_i
+        destination = routing.params['destinationLocationCode']
+        origin = routing.params['originLocationCode']
+        gemini_answer = gemini_mapper.find_gemini_data("What is your opinion on #{destination} in #{month}?" "Based on historical data, the average price for a flight from #{origin} to #{destination} is $#{historical_average_data}. Does it seem safe based on recent news articles: #{nytimes_articles.to_s}?")
 
         # Render the results view with all gathered data
         view 'results', locals: {

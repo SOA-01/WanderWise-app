@@ -143,6 +143,10 @@
           null,
           0,
           0,
+          null,
+          0,
+          0,
+          0,
           0,
           null,
           null,
@@ -276,7 +280,7 @@
           null
         ]
       },
-      "/Users/maxadolfsson/utbyte/Kurser/SOA/Project/WanderWise/monolith-WanderWise/app/models/entities/flight.rb": {
+      "/Users/maxadolfsson/utbyte/Kurser/SOA/Project/WanderWise/monolith-WanderWise/app/domain/entities/flight.rb": {
         "lines": [
           null,
           null,
@@ -394,7 +398,7 @@
           null
         ]
       },
-      "/Users/maxadolfsson/utbyte/Kurser/SOA/Project/WanderWise/monolith-WanderWise/app/models/entities/article.rb": {
+      "/Users/maxadolfsson/utbyte/Kurser/SOA/Project/WanderWise/monolith-WanderWise/app/domain/entities/article.rb": {
         "lines": [
           null,
           null,
@@ -532,7 +536,6 @@
           null,
           1,
           null,
-          1,
           1,
           1,
           null,
@@ -854,7 +857,7 @@
         ]
       }
     },
-    "timestamp": 1732098736
+    "timestamp": 1732162239
   },
   "rspec:28540": {
     "coverage": {
