@@ -5,7 +5,7 @@ http_interactions:
     uri: https://test.api.amadeus.com/v1/security/oauth2/token
     body:
       encoding: ASCII-8BIT
-      string: grant_type=client_credentials&client_id=6y7W4p38t2DXGuVv4qTjcthKGZy1KXZC&client_secret=7lG5kgvNJ9IxKYUA
+      string: grant_type=client_credentials&client_id=CZWB8K3jPit2WBhd06loXFtkGdYAOe7e&client_secret=xN8Asnn0OKCPPOOr
     headers:
       Connection:
       - close
@@ -21,7 +21,7 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 24 Oct 2024 02:45:39 GMT
+      - Sat, 23 Nov 2024 16:05:44 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -31,7 +31,7 @@ http_interactions:
       Host:
       - test.api.amadeus.com
       X-Forwarded-For:
-      - 140.114.123.102
+      - 223.140.5.77
       X-Forwarded-Port:
       - '443'
       X-Forwarded-Proto:
@@ -39,7 +39,7 @@ http_interactions:
       User-Agent:
       - http.rb/5.2.0
       Ama-Gateway-Request-Id:
-      - rrt-0e2e1b5c94d5436b2-b-de-113915-98500410-1
+      - rrt-0c0854d3450f6180d-a-de-1172538-222973727-1
       Access-Control-Allow-Origin:
       - "*"
       Access-Control-Allow-Headers:
@@ -54,9 +54,9 @@ http_interactions:
       encoding: UTF-8
       string: "\n        {\n            \"type\": \"amadeusOAuth2Token\",\n            \"username\":
         \"maxvadolfsson@gmail.com\",\n            \"application_name\": \"Travel aggregator\",\n
-        \           \"client_id\": \"6y7W4p38t2DXGuVv4qTjcthKGZy1KXZC\",\n            \"token_type\":
-        \"Bearer\",\n            \"access_token\": \"iUp657CKKoSj97kLFgmPpKOgoT8s\",\n
+        \           \"client_id\": \"CZWB8K3jPit2WBhd06loXFtkGdYAOe7e\",\n            \"token_type\":
+        \"Bearer\",\n            \"access_token\": \"C6jDN5xWC7pt4HidWdHiTi2LX6XC\",\n
         \           \"expires_in\": 1799,\n            \"state\": \"approved\",\n
         \           \"scope\": \"\"\n        }\n        "
-  recorded_at: Thu, 24 Oct 2024 02:45:40 GMT
+  recorded_at: Sat, 23 Nov 2024 16:05:44 GMT
 recorded_with: VCR 6.3.1

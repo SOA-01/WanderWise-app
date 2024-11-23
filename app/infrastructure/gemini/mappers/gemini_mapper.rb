@@ -1,18 +1,20 @@
-
+# frozen_string_literal: true
 
 module WanderWise
-    class GeminiMapper
-        def initialize(gateway)
-            @gateway = gateway
-        end
-
-        def find_gemini_data(prompt)
-            response = @gateway.gemini_api_call(prompt)
-            text = ""
-            for i in 0..response.length-1
-                text += response[i]["candidates"].first["content"]["parts"].first["text"]
-            end
-            text
-        end
+  class GeminiMapper # rubocop:disable Style/Documentation
+    def initialize(gateway)
+      @gateway = gateway
     end
+
+    def find_gemini_data(prompt) # rubocop:disable Metrics/AbcSize
+      response = @gateway.gemini_api_call(prompt)
+      text = ''
+      response.each do |res|
+        next unless res['candidates'] && res['candidates'].first['content'] && res['candidates'].first['content']['parts']
+
+        text += res['candidates'].first['content']['parts'].first['text']
+      end
+      text
+    end
+  end
 end

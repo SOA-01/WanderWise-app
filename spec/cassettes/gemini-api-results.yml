@@ -1,0 +1,48 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1/models/gemini-pro:streamGenerateContent?alt=sse&key=AIzaSyCgj52ZjGWGWrW--aa1AHt0k0fqSg_ZZ5g
+    body:
+      encoding: UTF-8
+      string: '{"contents":{"role":"user","parts":{"text":"Tell me about China in
+        10-15 words"}}}'
+    headers:
+      User-Agent:
+      - Faraday v2.12.1
+      Content-Type:
+      - application/json
+      Expect:
+      - ''
+  response:
+    status:
+      code: 200
+      message: ''
+    headers:
+      Content-Type:
+      - text/event-stream
+      Content-Disposition:
+      - attachment
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Sat, 23 Nov 2024 16:05:43 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=1670
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+    body:
+      encoding: ASCII-8BIT
+      string: ''
+  recorded_at: Sat, 23 Nov 2024 16:05:42 GMT
+recorded_with: VCR 6.3.1
