@@ -15,7 +15,11 @@ module WanderWise
       private
 
       def find_flights(input)
+
+        puts "Input: #{input}"
         result = flights_from_amadeus(input)
+
+        puts "Result: #{result}"
 
         return result if result.failure?
 
@@ -25,7 +29,9 @@ module WanderWise
       end
 
       def store_flights(input)
-        Repository::For.klass(Entity::Flight).create_many(input.value!)
+        Repository::For.klass(Entity::Flight).create_many(input)
+
+        puts "Input Value: #{input.value!}"
 
         Success(input.value!)
       rescue StandardError
