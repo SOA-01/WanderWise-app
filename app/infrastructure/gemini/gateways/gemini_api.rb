@@ -1,29 +1,31 @@
 require 'gemini-ai'
+require 'yaml'
 
 module WanderWise
-    class GeminiAPI
-        def initialize
-            environment = ENV['RACK_ENV'] || 'development'
-            secrets_file_path = './config/secrets.yml'
-            raise "secrets.yml file not found for #{environment} environment." unless File.exist?(secrets_file_path)
-    
-            secrets = YAML.load_file(secrets_file_path)
-            @client_key = 'AIzaSyCgj52ZjGWGWrW--aa1AHt0k0fqSg_ZZ5g'
-            
-            @client = Gemini.new(
-                credentials: {
-                  service: 'generative-language-api',
-                  api_key: @client_key
-                },
-                options: { model: 'gemini-pro', server_sent_events: true }
-              )
-              
-        end
+  class GeminiAPI # rubocop:disable Style/Documentation
+    def initialize # rubocop:disable Metrics/MethodLength
+      environment = ENV['RACK_ENV'] || 'development'
 
-        def gemini_api_call(prompt)
+      unless environment == 'production'
+        secrets_file_path = './config/secrets.yml'
+        raise "secrets.yml file not found for #{environment} environment." unless File.exist?(secrets_file_path)
 
-            result = @client.stream_generate_content({contents: { role: 'user', parts: { text: prompt } }})
-            result
-          end
+        YAML.load_file(secrets_file_path)
+      end
+
+      @client_key = ENV['GEMINI_API_KEY'] || 'AIzaSyCgj52ZjGWGWrW--aa1AHt0k0fqSg_ZZ5g'
+
+      @client = Gemini.new(
+        credentials: {
+          service: 'generative-language-api',
+          api_key: @client_key
+        },
+        options: { model: 'gemini-pro', server_sent_events: true }
+      )
     end
+
+    def gemini_api_call(prompt)
+      @client.stream_generate_content({ contents: { role: 'user', parts: { text: prompt } } })
+    end
+  end
 end
