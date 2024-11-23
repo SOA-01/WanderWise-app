@@ -2,7 +2,7 @@
 
 require 'rake/testtask'
 
-CODE = 'app/controllers'
+CODE = 'app/application/controllers'
 
 # Default task for Puma
 task :default do

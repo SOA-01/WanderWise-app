@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+ENV['SESSION_SECRET'] ||= 'T30S7Xh1X1ispHb_Z0Qp7A6pLijJo8esnPjOWcFCIONQNKgdma-DAJ_X9jmSpIIDtV0FndQRZh8lRX80MlAWHg=='
+ENV['RACK_ENV'] = 'test'
+
 require 'simplecov'
 SimpleCov.start
 require 'dotenv'
@@ -11,7 +14,7 @@ require 'vcr'
 require 'webmock'
 require 'rack/test'
 
-require_relative '../app/controllers/app'
+require_relative '../app/application/controllers/app'
 require_relative '../app/infrastructure/amadeus/gateways/amadeus_api'
 require_relative '../app/infrastructure/gemini/gateways/gemini_api'
 require_relative '../app/infrastructure/nytimes/gateways/nytimes_api'
@@ -20,9 +23,6 @@ require_relative '../app/infrastructure/nytimes/mappers/article_mapper'
 require_relative '../app/domain/entities/flight'
 require_relative '../app/domain/entities/article'
 require_relative 'database_helper'
-
-ENV['RACK_ENV'] = 'test'
-ENV['SESSION_SECRET'] = 'test_secret_key'
 
 curr_dir = __dir__
 CORRECT_NYT = YAML.load_file("#{curr_dir}/fixtures/nytimes-results.yml")
