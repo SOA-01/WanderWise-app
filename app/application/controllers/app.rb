@@ -48,7 +48,6 @@ module WanderWise
       routing.post 'submit' do # rubocop:disable Metrics/BlockLength
         # Step 0: Validate form data
         request = WanderWise::Forms::NewFlight.new.call(routing.params)
-
         if request.failure?
           request.errors.each do |error|
             session[:flash] = { error: error.message }
@@ -56,24 +55,14 @@ module WanderWise
           routing.redirect '/'
         end
 
-        puts "1"
-
         flight_made = Service::AddFlights.new.call(request.to_h)
-
-        puts "Flight Made: #{flight_made}"
-
-        puts "2"
 
         if flight_made.failure?
           session[:flash] = { error: flight_made.failure }
           routing.redirect '/'
         end
 
-        puts "2.5"
-
         flight_data = flight_made.value!
-
-        puts "2.6"
 
         country = Service::FindCountry.new.call(flight_data)
 
@@ -84,8 +73,6 @@ module WanderWise
 
         country = country.value!
 
-        puts "3"
-
         # Step 4: Retrieve historical flight price data
         analyze_flights = Service::AnalyzeFlights.new.call(flight_data)
 
@@ -94,16 +81,12 @@ module WanderWise
           routing.redirect '/'
         end
 
-        puts "4"
-
         article_made = Service::FindArticles.new.call(country)
 
         if article_made.failure?
           session[:flash] = { error: article_made.failure }
           routing.redirect '/'
         end
-
-        puts "5"
 
         nytimes_articles = article_made.value!
 
@@ -112,17 +95,20 @@ module WanderWise
         historical_flight_data = Views::HistoricalFlightData.new(analyze_flights.value![:historical_average_data],
                                                                  analyze_flights.value![:historical_lowest_data])
         destination_country = Views::Country.new(country)
+        # Step 6: Ask AI for opinion on the destination
+        gemini_api = WanderWise::GeminiAPI.new
+        gemini_mapper = WanderWise::GeminiMapper.new(gemini_api)
 
-        puts "6"
+        month = routing.params['departureDate'].split('-')[1].to_i
+        destination = routing.params['destinationLocationCode']
+        origin = routing.params['originLocationCode']
+        gemini_answer = gemini_mapper.find_gemini_data("What is your opinion on #{destination} in #{month}?" + "Based on historical data, the average price for a flight from #{origin} to #{destination} is $#{historical_flight_data.historical_average_data}. Does it seem safe based on recent news articles: #{nytimes_articles}?") # rubocop:disable Layout/LineLength
 
         # Render the results view with all gathered data
         view 'results', locals: {
           flight_data: retrieved_flights, country: destination_country, nytimes_articles: retrieved_articles,
-          historical_data: historical_flight_data
+          gemini_answer:, historical_data: historical_flight_data
         }
-
-        puts "7"
-
       rescue StandardError => e
         flash[:error] = 'An unexpected error occurred'
         logger.error "Flash Error: #{flash[:error]} - #{e.message}"
