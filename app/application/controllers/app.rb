@@ -48,10 +48,12 @@ module WanderWise
       routing.post 'submit' do # rubocop:disable Metrics/BlockLength
         # Step 0: Validate form data
         request = WanderWise::Forms::NewFlight.new.call(routing.params)
+        logger.debug "Params received: #{routing.params}"
         if request.failure?
           request.errors.each do |error|
             session[:flash] = { error: error.message }
           end
+          logger.error "Form errors: #{request.errors.to_h}"
           routing.redirect '/'
         end
 

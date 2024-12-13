@@ -32,6 +32,7 @@ gem 'hirb'
 gem 'logger'
 gem 'dotenv'
 gem 'ostruct'
+gem 'roar'
 
 group :production do
   gem 'pg'
