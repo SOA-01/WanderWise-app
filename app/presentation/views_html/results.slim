@@ -34,9 +34,9 @@ html
                                 td = flight['airline'] || 'N/A'
                                 td = flight['duration'] || 'N/A'
                 
-                - if gemini_answer
+                - if gemini_answer.opinion
                     h2.mt-4 Related AI response: 
-                    | #{gemini_answer}
+                    | #{gemini_answer.opinion}
                 - else
                     p.mt-4 No gemini_answer.
                     

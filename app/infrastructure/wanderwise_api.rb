@@ -29,6 +29,11 @@ module WanderWise
         @request.post('analyze', flight_data)
       end
 
+      def fetch_opinion(query_params)
+        puts "query_params: #{query_params}"
+        @request.get('opinion', query_params)
+      end
+
       # HTTP request transmitter
       class Request
         def initialize(config)
