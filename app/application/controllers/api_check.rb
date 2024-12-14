@@ -1,10 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../../infrastructure/amadeus/gateways/amadeus_api'
-require_relative '../../infrastructure/nytimes/gateways/nytimes_api'
-require_relative '../../infrastructure/amadeus/mappers/flight_mapper'
-require_relative '../../infrastructure/nytimes/mappers/article_mapper'
-
 module WanderWise
   # Main class to run the application logic
   class Main

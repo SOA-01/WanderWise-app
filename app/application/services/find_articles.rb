@@ -4,19 +4,17 @@ require 'dry/transaction'
 
 module WanderWise
   module Service
+    # Service to find articles
     class FindArticles
       include Dry::Transaction
 
       step :fetch_articles
 
-      def initialize(api_gateway)
-        @api_gateway = api_gateway
-      end
-
       private
 
       def fetch_articles(input)
-        response = @api_gateway.fetch_articles(input)
+        @api_gateway = WanderWise::Gateway::Api.new(WanderWise::App.config)
+        response = @api_gateway.fetch_articles(country: input)
 
         if response.success?
           Success(response.payload)

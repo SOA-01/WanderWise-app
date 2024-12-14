@@ -272,6 +272,7 @@ DEPENDENCIES
   simplecov
   slim
   sqlite3
+  uri
   vcr
   webmock
   yaml

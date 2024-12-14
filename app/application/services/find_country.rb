@@ -14,7 +14,7 @@ module WanderWise
       private
 
       def find_country(input)
-        country = Airports.find_by_iata_code(input.first.destination_location_code).country
+        country = Airports.find_by_iata_code(input[:destinationLocationCode]).country
 
         Success(country)
       rescue StandardError

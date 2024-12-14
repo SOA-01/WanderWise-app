@@ -25,14 +25,14 @@ html
                     tbody
                         - flight_data.each do |flight|
                             tr
-                                td = flight.origin_location_code
-                                td = flight.destination_location_code
-                                td = flight.departure_date
-                                td = flight.departure_time || 'N/A'
-                                td = flight.arrival_time || 'N/A'
-                                td = flight.price || 'N/A'
-                                td = flight.airline || 'N/A'
-                                td = flight.duration || 'N/A'
+                                td = flight['origin_location_code']
+                                td = flight['destination_location_code']
+                                td = flight['departure_date'] || 'N/A'
+                                td = flight['departure_time'] || 'N/A'
+                                td = flight['arrival_time'] || 'N/A'
+                                td = flight['price'] || 'N/A'
+                                td = flight['airline'] || 'N/A'
+                                td = flight['duration'] || 'N/A'
                 
                 - if gemini_answer
                     h2.mt-4 Related AI response: 
@@ -44,28 +44,26 @@ html
                     h2.mt-4 Historical Lowest Price
                     table.table.table-hover.mt-4
                         thead
-                            tr
-                                th Date
-                                th Price ($)
+                        tr
+                            th Value
                         tbody
-                            tr
-                                td = historical_data.historical_lowest_data.departure_date
-                                td = historical_data.historical_lowest_data.price
+                        tr
+                            td = historical_data.historical_lowest_data || 'N/A'
                 - else
                     p.mt-4 No historical data found.
-                
+
                 - if historical_data.historical_average_data
                     h2.mt-4 Historical Average Price
                     table.table.table-hover.mt-4
                         thead
-                            tr
-                                th Price ($)
+                        tr
+                            th Value
                         tbody
-                            tr
-                                td = historical_data.historical_average_data
-
+                        tr
+                            td = historical_data.historical_average_data || 'N/A'
                 - else
                     p.mt-4 No historical data found.
+
 
                 - if nytimes_articles.any?
                     h2.mt-4 Related News Articles in #{country.country}
@@ -78,10 +76,10 @@ html
                         tbody
                             - nytimes_articles.each do |article|
                                 tr
-                                    td = article.title
-                                    td = article.published_date
+                                    td = article['title']
+                                    td = article['published_date']
                                     td 
-                                        a href=article.url target="_blank" Read Article
+                                        a href=article['url'] target="_blank" Read Article
                 - else
                     p.mt-4 No related articles found for #{country}.
                 

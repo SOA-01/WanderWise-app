@@ -33,6 +33,7 @@ gem 'logger'
 gem 'dotenv'
 gem 'ostruct'
 gem 'roar'
+gem 'uri'
 
 group :production do
   gem 'pg'
