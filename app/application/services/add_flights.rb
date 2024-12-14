@@ -1,45 +1,51 @@
 # frozen_string_literal: true
 
 require 'dry/transaction'
-require_relative '../../infrastructure/database/repositories/flights'
 
 module WanderWise
   module Service
-    # Service to store flight data
-    class AddFlights
+    class AddFlights # rubocop:disable Style/Documentation
       include Dry::Transaction
 
-      step :find_flights
-      step :store_flights
+      step :validate_input
+      step :fetch_flights
 
       private
 
-      def find_flights(input)
-        result = flights_from_amadeus(input)
+      def validate_input(input)
+        # Adjust the parameter names to match the service's expected keys
+        input = transform_keys(input)
 
-        return result if result.failure?
-
-        Success(result.value!)
-      rescue StandardError
-        Failure('Could not find flight data')
+        # Ensure required parameters are present
+        if input[:originLocationCode] && input[:destinationLocationCode] && input[:departureDate]
+          Success(input)
+        else
+          Failure('Invalid input data')
+        end
       end
 
-      def store_flights(input)
-        Repository::For.klass(Entity::Flight).create_many(input)
+      def fetch_flights(input)
+        @api_gateway = WanderWise::Gateway::Api.new(WanderWise::App.config)
+        response = @api_gateway.fetch_flights(input)
 
-        Success(input)
-      rescue StandardError
-        Failure('Could not save flight data')
+        if response.success?
+          Success(response.payload)
+        else
+          Failure('Could not fetch flights')
+        end
       end
 
-      def flights_from_amadeus(input)
-        amadeus_api = AmadeusAPI.new
-        flight_mapper = FlightMapper.new(amadeus_api)
-        flight_data = flight_mapper.find_flight(input)
-
-        return Failure('No flights found for the given criteria.') if flight_data.empty? || flight_data.nil?
-
-        Success(flight_data)
+      # Helper to ensure keys match the expected ones in the service
+      def transform_keys(input)
+        input.transform_keys do |key|
+          case key
+          when :originLocationCode then :originLocationCode
+          when :destinationLocationCode then :destinationLocationCode
+          when :departureDate then :departureDate
+          when :adults then :adults
+          else key
+          end
+        end
       end
     end
   end

@@ -48,10 +48,12 @@ module WanderWise
       routing.post 'submit' do # rubocop:disable Metrics/BlockLength
         # Step 0: Validate form data
         request = WanderWise::Forms::NewFlight.new.call(routing.params)
+        logger.debug "Params received: #{routing.params}"
         if request.failure?
           request.errors.each do |error|
             session[:flash] = { error: error.message }
           end
+          logger.error "Form errors: #{request.errors.to_h}"
           routing.redirect '/'
         end
 
@@ -64,7 +66,7 @@ module WanderWise
 
         flight_data = flight_made.value!
 
-        country = Service::FindCountry.new.call(flight_data)
+        country = Service::FindCountry.new.call(request.to_h)
 
         if country.failure?
           session[:flash] = { error: country.failure }
@@ -74,7 +76,7 @@ module WanderWise
         country = country.value!
 
         # Step 4: Retrieve historical flight price data
-        analyze_flights = Service::AnalyzeFlights.new.call(flight_data)
+        analyze_flights = Service::AnalyzeFlights.new.call(request.to_h)
 
         if analyze_flights.failure?
           session[]
@@ -92,22 +94,31 @@ module WanderWise
 
         retrieved_flights = Views::FlightList.new(flight_data)
         retrieved_articles = Views::ArticleList.new(nytimes_articles)
-        historical_flight_data = Views::HistoricalFlightData.new(analyze_flights.value![:historical_average_data],
-                                                                 analyze_flights.value![:historical_lowest_data])
-        destination_country = Views::Country.new(country)
-        # Step 6: Ask AI for opinion on the destination
-        gemini_api = WanderWise::GeminiAPI.new
-        gemini_mapper = WanderWise::GeminiMapper.new(gemini_api)
+        parsed_analyze_flights = JSON.parse(analyze_flights.value!)
+        historical_flight_data = Views::HistoricalFlightData.new(
+          parsed_analyze_flights['historical_average_data'],
+          parsed_analyze_flights['historical_lowest_data']
+        )
 
-        month = routing.params['departureDate'].split('-')[1].to_i
-        destination = routing.params['destinationLocationCode']
-        origin = routing.params['originLocationCode']
-        gemini_answer = gemini_mapper.find_gemini_data("What is your opinion on #{destination} in #{month}?" + "Based on historical data, the average price for a flight from #{origin} to #{destination} is $#{historical_flight_data.historical_average_data}. Does it seem safe based on recent news articles: #{nytimes_articles}?") # rubocop:disable Layout/LineLength
+        destination_country = Views::Country.new(country)
+
+        # Step 6: Ask AI for opinion on the destination
+        # gemini_api = WanderWise::GeminiAPI.new
+        # gemini_mapper = WanderWise::GeminiMapper.new(gemini_api)
+
+        # month = routing.params['departureDate'].split('-')[1].to_i
+        # destination = routing.params['destinationLocationCode']
+        # origin = routing.params['originLocationCode']
+        # gemini_answer = gemini_mapper.find_gemini_data("What is your opinion on #{destination} in #{month}?" + "Based on historical data, the average price for a flight from #{origin} to #{destination} is $#{historical_flight_data.historical_average_data}. Does it seem safe based on recent news articles: #{nytimes_articles}?") # rubocop:disable Layout/LineLength
 
         # Render the results view with all gathered data
+
         view 'results', locals: {
-          flight_data: retrieved_flights, country: destination_country, nytimes_articles: retrieved_articles,
-          gemini_answer:, historical_data: historical_flight_data
+          flight_data: retrieved_flights,
+          country: destination_country,
+          nytimes_articles: retrieved_articles,
+          gemini_answer: 'AI RESPONSE',
+          historical_data: historical_flight_data
         }
       rescue StandardError => e
         flash[:error] = 'An unexpected error occurred'

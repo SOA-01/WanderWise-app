@@ -13,34 +13,14 @@ module WanderWise
       private
 
       def analyze_flights(input)
-        historical_average_data = historical_average(input)
-        historical_lowest_data = historical_lowest(input)
+        @api_gateway = WanderWise::Gateway::Api.new(WanderWise::App.config)
+        response = @api_gateway.analyze_flight(input)
 
-        Success(historical_average_data: historical_average_data.value!,
-                historical_lowest_data: historical_lowest_data.value!)
-      rescue StandardError
-        Failure('Could not analyze flight data')
-      end
-
-      def historical_average(input)
-        input = Repository::For.klass(Entity::Flight).find_average_price_from_to(
-          input.first.origin_location_code,
-          input.first.destination_location_code
-        ).round(2)
-
-        Success(input)
-      rescue StandardError
-        Failure('Could not retrieve historical average data')
-      end
-
-      def historical_lowest(input)
-        input = Repository::For.klass(Entity::Flight).find_best_price_from_to(
-          input.first.origin_location_code,
-          input.first.destination_location_code
-        )
-        Success(input)
-      rescue StandardError
-        Failure('Could not retrieve historical lowest data')
+        if response.success?
+          Success(response.payload)
+        else
+          Failure('Could not analyze flight data')
+        end
       end
     end
   end
