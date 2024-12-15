@@ -34,6 +34,7 @@ gem 'dotenv'
 gem 'ostruct'
 gem 'roar'
 gem 'uri'
+gem 'concurrent-ruby'
 
 group :production do
   gem 'pg'

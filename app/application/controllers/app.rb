@@ -6,126 +6,150 @@ require 'figaro'
 require 'securerandom'
 require_relative '../forms/new_flight'
 require 'logger'
+require 'concurrent'
 
 module WanderWise
   # Main application class for WanderWise
-  class App < Roda
+  class App < Roda # rubocop:disable Metrics/ClassLength
     plugin :flash
     plugin :render, engine: 'slim', views: 'app/presentation/views_html'
     plugin :assets, css: 'style.css', path: 'app/presentation/assets'
     plugin :halt
     plugin :sessions, secret: ENV['SESSION_SECRET']
 
-    # Create a logger instance (you can change the log file path as needed)
     def logger
-      @logger ||= Logger.new($stdout) # Logs to standard output (console)
+      @logger ||= Logger.new($stdout)
     end
 
     route do |routing| # rubocop:disable Metrics/BlockLength
       routing.assets
 
-      # Example of setting session data
       routing.get 'set_session' do
         session[:watching] = 'Some value'
         'Session data set!'
       end
 
-      # Example of accessing session data
       routing.get 'show_session' do
         session_data = session[:watching] || 'No data in session'
         "Session data: #{session_data}"
       end
 
-      # GET / request
       routing.root do
-        # Get cookie viewers from session
-        # session[:watching] ||= []
-
         view 'home'
       end
 
-      # POST /submit - Handle submitting flight data
       routing.post 'submit' do # rubocop:disable Metrics/BlockLength
-        # Step 0: Validate form data
+        logger.info 'Starting form validation'
         request = WanderWise::Forms::NewFlight.new.call(routing.params)
-        logger.debug "Params received: #{routing.params}"
         if request.failure?
-          request.errors.each do |error|
-            session[:flash] = { error: error.message }
+          session[:flash] = { error: request.errors.to_h.values.join(', ') }
+          logger.error "Form validation failed: #{request.errors.to_h}"
+          routing.redirect '/'
+        end
+
+        request_data = request.to_h
+        logger.info "Form validation successful: #{request_data}"
+
+        # Step 1: Concurrently load flights, country, and analysis data
+        logger.info 'Starting concurrent promises'
+        flights_promise = Concurrent::Promise.execute do
+          logger.info 'Loading flights...'
+          result = Service::AddFlights.new.call(request_data)
+          logger.info 'Flights loaded'
+          result
+        end
+
+        country_promise = Concurrent::Promise.execute do
+          logger.info 'Finding country...'
+          result = Service::FindCountry.new.call(request_data)
+          logger.info "Country found: #{result}"
+          result
+        end
+
+        analyze_flights_promise = Concurrent::Promise.execute do
+          logger.info 'Analyzing flights...'
+          result = Service::AnalyzeFlights.new.call(request_data)
+          logger.info "Flight analysis complete: #{result}"
+          result
+        end
+
+        # Fetch articles based on country result
+        articles_promise = country_promise.then do |country|
+          if country.success?
+            logger.info "Country found successfully: #{country.value!}. Fetching articles..."
+            Service::FindArticles.new.call(country.value!)
+          else
+            logger.error "Country failed: #{country.failure}"
+            Concurrent::Promise.reject(country.failure)
           end
-          logger.error "Form errors: #{request.errors.to_h}"
+        end
+
+        # Generate opinion based on results
+        opinion_promise = Concurrent::Promise.zip(country_promise, analyze_flights_promise,
+                                                  articles_promise).then do |(country, analyze_flights, articles)|
+          if country.success? && analyze_flights.success? && articles.success?
+            logger.info 'Country, flight analysis, and articles fetched successfully. Generating opinion...'
+            details = {
+              month: routing.params['departureDate'].split('-')[1].to_i,
+              destination: country.value!,
+              origin: routing.params['originLocationCode'],
+              historical_average_data: JSON.parse(analyze_flights.value!)['historical_average_data'],
+              articles: articles.value!
+            }
+            result = Service::GetOpinion.new.call(details)
+            if result.success?
+              result.value!
+            else
+              logger.error "Opinion generation failed: #{result.failure}"
+              'No opinion available' # Fallback
+            end
+          else
+            logger.error "Failed to generate opinion: country - #{country.failure}, analyze_flights - #{analyze_flights.failure}, articles - #{articles.failure}" # rubocop:disable Layout/LineLength
+            'No opinion available' # Fallback
+          end
+        end
+
+        logger.info 'Waiting for all promises to resolve'
+        Concurrent::Promise.zip(
+          flights_promise, country_promise, analyze_flights_promise, articles_promise, opinion_promise
+        ).value!
+
+        # Collect results and handle failures
+        logger.info 'Collecting results'
+        flight_data = flights_promise.value!
+        country_result = country_promise.value!
+        analyze_flights_result = analyze_flights_promise.value!
+        articles_result = articles_promise.value!
+        opinion_result = opinion_promise.value! # No `.value!` if it's already a string fallback
+
+        logger.info 'Results collected'
+
+        errors = []
+        errors << flight_data.failure if flight_data.failure?
+        errors << country_result.failure if country_result.failure?
+        errors << analyze_flights_result.failure if analyze_flights_result.failure?
+        errors << articles_result.failure if articles_result.failure?
+
+        # NOTE: Do not add opinion errors, as it already has a fallback
+        unless errors.empty?
+          logger.error "Errors encountered: #{errors.join(', ')}"
+          session[:flash] = { error: errors.join(', ') }
           routing.redirect '/'
         end
 
-        # Step 1: Find flights
-        flight_made = Service::AddFlights.new.call(request.to_h)
-
-        if flight_made.failure?
-          session[:flash] = { error: flight_made.failure }
-          routing.redirect '/'
-        end
-
-        flight_data = flight_made.value!
-        retrieved_flights = Views::FlightList.new(flight_data)
-
-        # Step 2: Find the destination country
-        country = Service::FindCountry.new.call(request.to_h)
-
-        if country.failure?
-          session[:flash] = { error: country.failure }
-          routing.redirect '/'
-        end
-
-        country = country.value!
-        destination_country = Views::Country.new(country)
-
-        # Step 4: Retrieve historical flight price data
-        analyze_flights = Service::AnalyzeFlights.new.call(request.to_h)
-
-        if analyze_flights.failure?
-          session[]
-          routing.redirect '/'
-        end
-
-        parsed_analyze_flights = JSON.parse(analyze_flights.value!)
+        # Prepare data for rendering
+        logger.info 'Preparing data for rendering'
+        retrieved_flights = Views::FlightList.new(flight_data.value!)
+        destination_country = Views::Country.new(country_result.value!)
         historical_flight_data = Views::HistoricalFlightData.new(
-          parsed_analyze_flights['historical_average_data'],
-          parsed_analyze_flights['historical_lowest_data']
+          JSON.parse(analyze_flights_result.value!)['historical_average_data'],
+          JSON.parse(analyze_flights_result.value!)['historical_lowest_data']
         )
+        retrieved_articles = Views::ArticleList.new(articles_result.value!)
+        gemini_answer = Views::Opinion.new(opinion_result) # Use the fallback directly
 
-        # Step 5: Retrieve news articles about the destination
-        article_made = Service::FindArticles.new.call(country)
-
-        if article_made.failure?
-          session[:flash] = { error: article_made.failure }
-          routing.redirect '/'
-        end
-
-        nytimes_articles = article_made.value!
-        retrieved_articles = Views::ArticleList.new(nytimes_articles)
-
-        month = routing.params['departureDate'].split('-')[1].to_i
-        origin = routing.params['originLocationCode']
-
-        details = {
-          month: month,
-          destination: country,
-          origin: origin,
-          historical_average_data: parsed_analyze_flights['historical_average_data'],
-          nytimes_articles: nytimes_articles
-        }
-
-        opinion_made = Service::GetOpinion.new.call(details)
-
-        if opinion_made.failure?
-          session[:flash] = { error: opinion_made.failure }
-          gemini_data = 'No opinion available'
-        else
-          gemini_data = opinion_made.value!
-        end
-
-        gemini_answer = Views::Opinion.new(gemini_data)
-
+        # Render results
+        logger.info 'Rendering results view'
         view 'results', locals: {
           flight_data: retrieved_flights,
           country: destination_country,
@@ -134,10 +158,11 @@ module WanderWise
           historical_data: historical_flight_data
         }
       rescue StandardError => e
+        logger.error "Unexpected error: #{e.message}"
+        logger.error e.backtrace.join("\n") # Log the full backtrace
         flash[:error] = 'An unexpected error occurred'
-        logger.error "Flash Error: #{flash[:error]} - #{e.message}"
         session[:flash] = flash.to_hash
-        routing.redirect '/' # Do not redirect immediately after setting flash
+        routing.redirect '/'
       end
     end
   end

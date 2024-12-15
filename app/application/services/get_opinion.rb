@@ -13,7 +13,6 @@ module WanderWise
       private
 
       def fetch_opinion(input)
-        puts "input: #{input}"
         @api_gateway = WanderWise::Gateway::Api.new(WanderWise::App.config)
         response = @api_gateway.fetch_opinion(input)
 

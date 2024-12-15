@@ -244,6 +244,7 @@ PLATFORMS
 
 DEPENDENCIES
   airports
+  concurrent-ruby
   dotenv
   dry-struct
   dry-transaction
