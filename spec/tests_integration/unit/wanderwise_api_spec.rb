@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative '../../spec_helper.rb'
-require_relative '../../../config/environment.rb' # Ensure the environment is loaded
+require_relative '../../spec_helper'
+require_relative '../../../config/environment' # Ensure the environment is loaded
 
 describe 'Unit test of WanderWise API gateway' do
   before do
