@@ -11,7 +11,7 @@ require_relative '../app/infrastructure/database/repositories/flights'
 require_relative '../app/infrastructure/database/repositories/articles'
 require_relative '../app/infrastructure/database/repositories/entity'
 
-# RSpec.describe WanderWise::AmadeusAPI do # rubocop:disable Metrics/BlockLength
+# RSpec.describe WanderWise::AmadeusAPI do
 #   VCR.configure do |c|
 #     c.cassette_library_dir = 'spec/fixtures/cassettes'
 #     c.hook_into :webmock
@@ -109,7 +109,7 @@ RSpec.describe WanderWise::GeminiAPI, :vcr do
   after do
     VCR.eject_cassette
   end
-  
+
   let(:gemini_api) { WanderWise::GeminiAPI.new }
 
   it 'receives valid response from the API' do
