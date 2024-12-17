@@ -84,6 +84,13 @@ module WanderWise
           end
         end
 
+        # Create ProgressPage instance
+        logger.info 'Initializing ProgressPage'
+        progress_page = Views::ProgressPage.new(
+          OpenStruct.new(API_HOST: ENV['API_HOST']), 
+          flights_promise
+        )
+
         # Generate opinion based on results
         opinion_promise = Concurrent::Promise.zip(country_promise, analyze_flights_promise,
                                                   articles_promise).then do |(country, analyze_flights, articles)|
@@ -155,7 +162,9 @@ module WanderWise
           country: destination_country,
           nytimes_articles: retrieved_articles,
           gemini_answer: gemini_answer,
-          historical_data: historical_flight_data
+          historical_data: historical_flight_data,
+          progress_channel_id: progress_page.channel_id,
+          faye_js_url: progress_page.faye_javascript_url
         }
       rescue StandardError => e
         logger.error "Unexpected error: #{e.message}"
