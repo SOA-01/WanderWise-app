@@ -35,6 +35,7 @@ gem 'ostruct'
 gem 'roar'
 gem 'uri'
 gem 'concurrent-ruby'
+gem 'redis'
 
 
 group :production do

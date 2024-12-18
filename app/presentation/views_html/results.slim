@@ -7,10 +7,6 @@ html
         meta charset="utf-8"
         meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"
         link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        - if @view_object&.channel_id
-        script
-            | var channelId = "#{@view_object.channel_id}";
-        script src=@view_object.faye_javascript_url
     body
         .container
             h1.mt-4 Flight Results
@@ -29,21 +25,22 @@ html
                     tbody
                         - flight_data.each do |flight|
                             tr
-                                td = flight['origin_location_code']
-                                td = flight['destination_location_code']
-                                td = flight['departure_date'] || 'N/A'
-                                td = flight['departure_time'] || 'N/A'
-                                td = flight['arrival_time'] || 'N/A'
-                                td = flight['price'] || 'N/A'
-                                td = flight['airline'] || 'N/A'
-                                td = flight['duration'] || 'N/A'
+                                td = flight[:origin_location_code]
+                                td = flight[:destination_location_code]
+                                td = flight[:departure_date] || 'N/A'
+                                td = flight[:departure_time] || 'N/A'
+                                td = flight[:arrival_time] || 'N/A'
+                                td = flight[:price] || 'N/A'
+                                td = flight[:airline] || 'N/A'
+                                td = flight[:duration] || 'N/A'
                 
-                - if gemini_answer.opinion
-                    h2.mt-4 Related AI response: 
-                    | #{gemini_answer.opinion}
+                - if formatted_opinion
+                    h2.mt-4 Related AI Response:
+                    .formatted-opinion.mt-2
+                    == formatted_opinion
                 - else
                     p.mt-4 No gemini_answer.
-                    
+
                 - if historical_data.historical_lowest_data
                     h2.mt-4 Historical Lowest Price
                     table.table.table-hover.mt-4

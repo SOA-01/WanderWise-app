@@ -4,7 +4,7 @@ module Views
   # View for a list of entities of flights
   class FlightList
     def initialize(flights)
-      @flights = JSON.parse(flights)['flights']
+      @flights = flights.is_a?(String) ? JSON.parse(flights) : flights
     end
 
     def each(&block)
