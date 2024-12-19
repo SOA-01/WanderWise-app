@@ -54,12 +54,12 @@ module WanderWise
       end
 
       routing.root do
-        processing = false
         view 'home'
       end
 
       routing.post 'submit' do # rubocop:disable Metrics/BlockLength
         session[:id] ||= WanderWise::App.config.SESSION_SECRET
+        redis_key = "results:#{session[:id]}"
         puts "Session ID: #{session[:id]}"
 
         logger.info 'Starting form validation'
@@ -153,13 +153,15 @@ module WanderWise
           logger.info "Cache miss for flights: flights:#{request_data[:originLocationCode]}:#{request_data[:destinationLocationCode]}:#{request_data[:departureDate]}:#{request_data[:adults]}"
           flight_data = flights_promise.value!
           if flight_data.success?
-            redis.set("flights:#{request_data[:originLocationCode]}:#{request_data[:destinationLocationCode]}:#{request_data[:departureDate]}:#{request_data[:adults]}", flight_data.value!.map(&:to_h).to_json, ex: 60)
-            logger.info "Flight data cached."
+            redis.set(
+              "flights:#{request_data[:originLocationCode]}:#{request_data[:destinationLocationCode]}:#{request_data[:departureDate]}:#{request_data[:adults]}", flight_data.value!.map(&:to_h).to_json, ex: 60
+            )
+            logger.info 'Flight data cached.'
           else
             logger.error "Failed to fetch flight data: #{flight_data.failure}"
           end
         else
-          logger.info "Cache hit for flights."
+          logger.info 'Cache hit for flights.'
           flight_data = JSON.parse(flight_data, symbolize_names: true)
         end
 
@@ -179,7 +181,7 @@ module WanderWise
           routing.redirect '/'
         end
 
-        redis.del(progress_key) # Clear progress tracking after completion
+        # redis.del(progress_key) # Clear progress tracking after completion
 
         destination_country = Views::Country.new(country_result.value!)
         historical_flight_data = Views::HistoricalFlightData.new(
@@ -199,19 +201,60 @@ module WanderWise
                               'No opinion available.'
                             end
 
-        view 'results', locals: {
-          flight_data: Views::FlightList.new(flight_data.map(&:to_h)),
-          country: destination_country,
-          nytimes_articles: retrieved_articles,
-          formatted_opinion: formatted_opinion,
-          historical_data: historical_flight_data
+        redis.set(progress_key, { status: 100 }.to_json)
+
+        puts "Destination country: #{destination_country}"
+        puts "Destination country: #{destination_country.to_h}"
+
+        result_data = {
+          flight_data: flight_data.map(&:to_h), # Already JSON-compatible
+          destination_country: destination_country.to_h, # Convert object to hash
+          nytimes_articles: retrieved_articles.to_h, # Convert articles list to an array of hashes
+          formatted_opinion: formatted_opinion.to_s, # Convert to a string
+          historical_data: {
+            historical_average_data: historical_flight_data.historical_average_data,
+            historical_lowest_data: historical_flight_data.historical_lowest_data
+          }
         }
+
+        redis.set(redis_key, result_data.to_json, ex: 120) # Store JSON
+
+        # Respond to the AJAX request
+        response.status = 200
+        routing.redirect '/results'
       rescue StandardError => e
         logger.error "Unexpected error: #{e.message}"
         logger.error e.backtrace.join("\n")
         flash[:error] = 'An unexpected error occurred'
         session[:flash] = flash.to_hash
         routing.redirect '/'
+      end
+
+      routing.get 'results' do
+        session[:id] ||= WanderWise::App.config.SESSION_SECRET
+        redis_key = "results:#{session[:id]}"
+        result_data_json = redis.get(redis_key)
+
+        unless result_data_json
+          session[:flash] = { error: 'No results found. Please try submitting again.' }
+          routing.redirect '/'
+        end
+
+        result_data = JSON.parse(result_data_json, symbolize_names: true)
+
+        # Reconstruct Ruby objects
+        flight_data = result_data[:flight_data]
+        destination_country = result_data[:destination_country]
+        nytimes_articles = result_data[:nytimes_articles]
+        historical_data = result_data[:historical_data]
+
+        view 'results', locals: {
+          flight_data: flight_data,
+          country: destination_country,
+          articles: nytimes_articles,
+          opinion: result_data[:formatted_opinion],
+          historical_data: historical_data
+        }
       end
     end
   end

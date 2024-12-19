@@ -7,6 +7,16 @@ module Views
       @articles = JSON.parse(articles)['articles']
     end
 
+    def to_h
+      @articles.map do |article|
+        {
+          title: article['title'],
+          published_date: article['published_date'],
+          url: article['url']
+        }
+      end
+    end
+
     def each(&block)
       @articles.each(&block)
     end
