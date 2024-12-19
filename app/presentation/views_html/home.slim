@@ -3,7 +3,8 @@ html
   head
     title WanderWise
     == assets :css
-    script src="https://code.jquery.com/jquery-3.6.0.min.js"
+    == assets :js
+    script src="https://code.jquery.com/jquery-3.6.0.min.js" 
   body
     .container
       == render 'flash_bar'
@@ -36,68 +37,48 @@ html
       .progress
         .progress-bar.bg-success[role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"]
           | 0%
+  - if processing.in_progress?
+    .progress
+    .progress-bar.bg-success.progress-bar-striped.active[
+      role="progressbar" aria-valuenow="10" aria-valuemin="0"
+      aria-valuemax="100" style="width:0%"]
+    script src = "#{processing.ws_javascript}"
+    javascript:
+      var channel = "#{processing[:ws_channel_id]}";
+      var client = new WebSocket("#{processing[:ws_route]}");
+      var bar = document.getElementsByClassName("progress-bar")[0];
+      var reg = /\:(\d+)%/;
 
-      script
-        | $(document).ready(function () {
-        |   console.log('JavaScript loaded!');
-        |
-        |   function updateProgress() {
-        |     console.log('Sending request to /progress');
-        |     $.ajax({
-        |       url: '/progress',
-        |       method: 'GET',
-        |       success: function (data) {
-        |         console.log('Progress data received:', data);
-        |         try {
-        |           const progress = data.status || 0; // Use the returned object directly
-        |
-        |           // Update progress bar
-        |           const progressBar = $('.progress-bar');
-        |           progressBar.css('width', `${progress}%`);
-        |           progressBar.attr('aria-valuenow', progress);
-        |           progressBar.text(`${progress}%`);
-        |
-        |           // Continue polling if progress is less than 100
-        |           if (progress < 100) {
-        |             setTimeout(updateProgress, 1000);
-        |           } else {
-        |             console.log('Progress complete!');
-        |           }
-        |         } catch (e) {
-        |           console.error('Error processing progress data:', e);
-        |         }
-        |       },
-        |       error: function (xhr, status, error) {
-        |         console.error('Error fetching progress:', error);
-        |       }
-        |     });
-        |   }
-        |
-        |   $('form').on('submit', function (e) {
-        |     e.preventDefault(); // Prevent default form submission
-        |
-        |     // Reset progress bar
-        |     const progressBar = $('.progress-bar');
-        |     progressBar.css('width', '0%');
-        |     progressBar.attr('aria-valuenow', 0);
-        |     progressBar.text('0%');
-        |
-        |     const formData = $(this).serialize();
-        |     console.log('Submitting form data:', formData);
-        |
-        |     // Submit form via AJAX
-        |     $.ajax({
-        |       url: '/submit',
-        |       method: 'POST',
-        |       data: formData,
-        |       success: function () {
-        |         console.log('Form submitted successfully, starting progress update');
-        |         updateProgress(); // Start polling progress
-        |       },
-        |       error: function (xhr, status, error) {
-        |         console.error('Error submitting form:', error);
-        |         alert('An error occurred. Please try again.');
-        |       }
-        |     });
-        |   });
-        | });
+      client.onmessage = function(event) {
+          var message = event.data;
+
+          // Collect progress bar element and percentage
+          var progress = bar.getAttribute("style");
+          var currentProgress = reg.exec(progress) ? reg.exec(progress)[1] : "0";
+
+          if (isNaN(message)) {
+              bar.setAttribute("style", "width:100%");
+              bar.setAttribute("class", "progress-bar bg-danger progress-bar-striped");
+              bar.innerHTML = message;
+          } else {
+              if (parseInt(message) > parseInt(currentProgress)) {
+                  bar.setAttribute("aria-valuenow", message);
+                  bar.setAttribute("style", "width:" + message + "%");
+                  bar.innerHTML = message + "%";
+
+                  if (message === "100") {
+                      setTimeout(function () {
+                          window.location = window.location.href;
+                      }, 1000);
+                  }
+              }
+          }
+      };
+
+      client.onerror = function() {
+          console.error("WebSocket encountered an error.");
+      };
+
+      client.onclose = function() {
+          console.warn("WebSocket connection closed.");
+      };

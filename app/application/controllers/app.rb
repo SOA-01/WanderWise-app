@@ -15,6 +15,7 @@ module WanderWise
     plugin :flash
     plugin :render, engine: 'slim', views: 'app/presentation/views_html'
     plugin :assets, css: 'style.css', path: 'app/presentation/assets'
+    plugin :assets, js: 'custom.js', path: 'app/presentation/assets'
     plugin :halt
     plugin :sessions, secret: ENV['SESSION_SECRET'], key: 'wanderwise.session', cookie_options: { secure: true, httponly: true, same_site: :none }
 
@@ -53,6 +54,7 @@ module WanderWise
       end
 
       routing.root do
+        processing = false
         view 'home'
       end
 
@@ -77,36 +79,36 @@ module WanderWise
         # Concurrent promises with progress updates
         flights_promise = Concurrent::Promise.execute do
           redis.set(progress_key, { status: 20 }.to_json)
-          logger.debug '20% Flights promise started'
+          logger.debug "20% Flights promise started: #{redis.get(progress_key)}"
           result = Service::AddFlights.new.call(request_data)
           redis.set(progress_key, { status: 30 }.to_json)
-          logger.debug '30% Flights promise completed'
+          logger.debug "30% Flights promise completed: #{redis.get(progress_key)}"
 
           result
         end
 
         country_promise = Concurrent::Promise.execute do
           redis.set(progress_key, { status: 40 }.to_json)
-          logger.debug '40% Country promise started'
+          logger.debug "40% Country promise started: #{redis.get(progress_key)}"
           result = Service::FindCountry.new.call(request_data)
           redis.set(progress_key, { status: 50 }.to_json)
-          logger.debug '50% Country promise completed'
+          logger.debug "50% Country promise completed: #{redis.get(progress_key)}"
           result
         end
 
         analyze_flights_promise = Concurrent::Promise.execute do
           redis.set(progress_key, { status: 60 }.to_json)
-          logger.debug '60% Analyze flights promise started'
+          logger.debug "60% Analyze flights promise started: #{redis.get(progress_key)}"
           result = Service::AnalyzeFlights.new.call(request_data)
           redis.set(progress_key, { status: 70 }.to_json)
-          logger.debug '70% Analyze flights promise completed'
+          logger.debug "70% Analyze flights promise completed: #{redis.get(progress_key)}"
           result
         end
 
         articles_promise = country_promise.then do |country|
           if country.success?
             redis.set(progress_key, { status: 80 }.to_json)
-            logger.debug '80% Articles promise started'
+            logger.debug "80% Articles promise started: #{redis.get(progress_key)}"
             Service::FindArticles.new.call(country.value!)
           else
             redis.set(progress_key, { status: 0 }.to_json)
@@ -119,7 +121,7 @@ module WanderWise
                                                   articles_promise).then do |(country, analyze_flights, articles)|
           if country.success? && analyze_flights.success? && articles.success?
             redis.set(progress_key, { status: 95 }.to_json)
-            logger.debug '95% Opinion promise started'
+            logger.debug "95% Opinion promise started: #{redis.get(progress_key)}"
             details = {
               month: routing.params['departureDate'].split('-')[1].to_i,
               destination: country.value!,
@@ -129,7 +131,7 @@ module WanderWise
             }
             result = Service::GetOpinion.new.call(details)
             redis.set(progress_key, { status: 97 }.to_json)
-            logger.debug '97% Opinion promise completed'
+            logger.debug "97% Opinion promise completed: #{redis.get(progress_key)}"
             result
           else
             redis.set(progress_key, { status: 0 }.to_json)
