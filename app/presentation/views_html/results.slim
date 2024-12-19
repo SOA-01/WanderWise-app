@@ -1,91 +1,93 @@
-<meta charset="utf-8">
-
 doctype html
 html
-    head
-        title Flight Results
-        meta charset="utf-8"
-        meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"
-        link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-    body
-        .container
-            h1.mt-4 Flight Results
-            - if flight_data
-                table.table.table-striped.mt-4
-                    thead
-                        tr
-                            th Origin
-                            th Destination
-                            th Departure Date
-                            th Departure Time
-                            th Arrival Time
-                            th Price ($)
-                            th Airline
-                            th Duration
-                    tbody
-                        - flight_data.each do |flight|
-                            tr
-                                td = flight['origin_location_code']
-                                td = flight['destination_location_code']
-                                td = flight['departure_date'] || 'N/A'
-                                td = flight['departure_time'] || 'N/A'
-                                td = flight['arrival_time'] || 'N/A'
-                                td = flight['price'] || 'N/A'
-                                td = flight['airline'] || 'N/A'
-                                td = flight['duration'] || 'N/A'
-                
-                - if gemini_answer.opinion
-                    h2.mt-4 Related AI response: 
-                    | #{gemini_answer.opinion}
-                - else
-                    p.mt-4 No gemini_answer.
-                    
-                - if historical_data.historical_lowest_data
-                    h2.mt-4 Historical Lowest Price
-                    table.table.table-hover.mt-4
-                        thead
-                        tr
-                            th Value
-                        tbody
-                        tr
-                            td = historical_data.historical_lowest_data || 'N/A'
-                - else
-                    p.mt-4 No historical data found.
+  head
+    title Flight Results
+    meta charset="utf-8"
+    meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+  body
+    .container
+      h1.mt-4 Flight Results
 
-                - if historical_data.historical_average_data
-                    h2.mt-4 Historical Average Price
-                    table.table.table-hover.mt-4
-                        thead
-                        tr
-                            th Value
-                        tbody
-                        tr
-                            td = historical_data.historical_average_data || 'N/A'
-                - else
-                    p.mt-4 No historical data found.
+      - if flight_data.respond_to?(:any?) && flight_data.any?
+        h2.mt-4 Flight Options
+        table.table.table-striped.mt-4
+          thead
+            tr
+              th Origin
+              th Destination
+              th Departure Date
+              th Departure Time
+              th Arrival Time
+              th Price ($)
+              th Airline
+              th Duration
+          tbody
+            - flight_data.each do |flight|
+              tr
+                td = flight[:origin_location_code] || 'N/A'
+                td = flight[:destination_location_code] || 'N/A'
+                td = flight[:departure_date] || 'N/A'
+                td = flight[:departure_time] || 'N/A'
+                td = flight[:arrival_time] || 'N/A'
+                td = flight[:price] || 'N/A'
+                td = flight[:airline] || 'N/A'
+                td = flight[:duration] || 'N/A'
+      - else
+        .alert.alert-warning.mt-4 No flights found.
 
+      - if opinion
+        h2.mt-4 Related AI Response
+        .formatted-opinion.mt-2
+          == opinion
+      - else
+        p.mt-4 No opinion available.
 
-                - if nytimes_articles.any?
-                    h2.mt-4 Related News Articles in #{country.country}
-                    table.table.table-hover.mt-4
-                        thead
-                            tr
-                                th Title
-                                th Published Date
-                                th Link
-                        tbody
-                            - nytimes_articles.each do |article|
-                                tr
-                                    td = article['title']
-                                    td = article['published_date']
-                                    td 
-                                        a href=article['url'] target="_blank" Read Article
-                - else
-                    p.mt-4 No related articles found for #{country}.
-                
-            - else
-                .alert.alert-warning.mt-4 No flights found.
+      - if historical_data.any?
+        - if historical_data[:historical_lowest_data]
+          h2.mt-4 Historical Lowest Price
+          table.table.table-hover.mt-4
+            thead
+              tr
+                th Value
+            tbody
+              tr
+                td = historical_data[:historical_lowest_data] || 'N/A'
+        - else
+          p.mt-4 No historical lowest price data found.
 
-        script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        - if historical_data[:historical_average_data]
+          h2.mt-4 Historical Average Price
+          table.table.table-hover.mt-4
+            thead
+              tr
+                th Value
+            tbody
+              tr
+                td = historical_data[:historical_average_data] || 'N/A'
+        - else
+          p.mt-4 No historical average price data found.
+      - else
+        p.mt-4 No historical data found.
+
+      - if articles.any?
+        h2.mt-4 Related News Articles in #{country['name'] || 'the destination'}
+        table.table.table-hover.mt-4
+          thead
+            tr
+              th Title
+              th Published Date
+              th Link
+          tbody
+            - articles.each do |article|
+              tr
+                td = article[:title]
+                td = article[:published_date] || 'N/A'
+                td
+                  a href=article[:url] target="_blank" Read Article
+      - else
+        p.mt-4 No related articles found for #{country['name'] || 'the destination'}.
+
+    script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"

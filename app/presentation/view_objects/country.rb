@@ -8,5 +8,11 @@ module Views
     def initialize(country)
       @country = country
     end
+
+    def to_h
+      {
+        name: @country['name']
+      }
+    end
   end
 end

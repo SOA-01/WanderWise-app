@@ -3,7 +3,9 @@ html
   head
     title WanderWise
     == assets :css
+    script src="https://code.jquery.com/jquery-3.6.0.min.js"
   body
+
     .container
       == render 'flash_bar'
 
@@ -29,3 +31,88 @@ html
         br
 
         input.btn.btn-primary type="submit" value="Submit"
+
+      hr
+      h3.mt-4 Progress
+      .progress
+        .progress-bar.bg-success[role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"]
+          | 0%
+
+      script
+        | $(document).ready(function () {
+        |   console.log('JavaScript loaded!');
+        |
+        |   let fakeProgressInterval;
+        |
+        |   function fakeProgress() {
+        |     const progressBar = $('.progress-bar');
+        |     let progress = 0;
+        |
+        |     fakeProgressInterval = setInterval(function () {
+        |       if (progress < 90) {
+        |         progress += Math.floor(Math.random() * 10) + 5;
+        |         if (progress > 90) progress = 90;
+        |         progressBar.css('width', `${progress}%`);
+        |         progressBar.attr('aria-valuenow', progress);
+        |         progressBar.text(`${progress}%`);
+        |         console.log(`Progress: ${progress}%`);
+        |       } else {
+        |         clearInterval(fakeProgressInterval);
+        |       }
+        |     }, 500);
+        |   }
+        |
+        |   function updateProgress() {
+        |     $.ajax({
+        |       url: '/progress',
+        |       method: 'GET',
+        |       success: function (data) {
+        |         let progress;
+        |         try {
+        |           progress = typeof data === 'string' ? JSON.parse(data).status : data.status;
+        |         } catch (e) {
+        |           console.error('Failed to parse progress data:', e);
+        |           return;
+        |         }
+        |
+        |         const progressBar = $('.progress-bar');
+        |         progressBar.css('width', `${progress}%`);
+        |         progressBar.attr('aria-valuenow', progress);
+        |         progressBar.text(`${progress}%`);
+        |
+        |         if (progress < 100) {
+        |           setTimeout(updateProgress, 1000);
+        |         } else {
+        |           clearInterval(fakeProgressInterval);
+        |         }
+        |       },
+        |       error: function () {
+        |         console.error('Error fetching progress.');
+        |       },
+        |     });
+        |   }
+        |
+        |   $('form').on('submit', function (e) {
+        |     e.preventDefault();
+        |     const progressBar = $('.progress-bar');
+        |     progressBar.css('width', '0%').attr('aria-valuenow', 0).text('0%');
+        |
+        |     fakeProgress();
+        |
+        |     const formData = $(this).serialize();
+        |     $.ajax({
+        |       url: '/submit',
+        |       method: 'POST',
+        |       data: formData,
+        |       success: function () {
+        |         updateProgress();
+        |         console.log(`Progress: 100%`);
+        |         window.location.href = '/results';
+        |       },
+        |       error: function () {
+        |         alert('An error occurred.');
+        |         clearInterval(fakeProgressInterval);
+        |       },
+        |     });
+        |   });
+        | });

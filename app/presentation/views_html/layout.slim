@@ -12,6 +12,8 @@ html
       |   padding: 20px;
       |   text-align: center;
       | }
+    - if @view_object&.faye_javascript_url
+      script src=@view_object.faye_javascript_url
   body
     nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.fixed-top
       .container
@@ -29,6 +31,40 @@ html
 
     .container
       == render 'flash_bar'
+
+      - if @view_object&.in_progress?
+        .progress
+          .progress-bar.bg-success.progress-bar-striped.active[
+            role="progressbar" aria-valuenow="0" aria-valuemin="0"
+            aria-valuemax="100" style="width:0%"
+          ]
+        script src=@view_object.faye_javascript_url
+        javascript:
+          var channel = "#{@view_object.channel_id}";
+          var client = new Faye.Client("#{ @view_object.faye_javascript_url }");
+          var bar = document.getElementsByClassName("progress-bar")[0];
+          var reg = /\:(\d+)%/;
+          client.subscribe('/' + channel, function(message) {
+            var progress = bar.getAttribute("style");
+            var currentProgress = reg.exec(progress)[1];
+            if (isNaN(message)) {
+              bar.setAttribute("style", "width:100%");
+              bar.setAttribute("class", "progress-bar bg-danger progress-bar-striped");
+              bar.innerHTML = message;
+            } else {
+              if (parseInt(message) > parseInt(currentProgress)) {
+                bar.setAttribute("aria-valuenow", message);
+                bar.setAttribute("style", "width:"+message+"%");
+                bar.innerHTML = message+"%";
+                if (message == "100") {
+                  setTimeout(function () {
+                    window.location = window.location.href;
+                  }, 1000);
+                }
+              }
+            }
+          });
+
       == yield
 
     footer.footer
